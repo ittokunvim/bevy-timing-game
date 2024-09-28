@@ -13,6 +13,7 @@ use crate::ingame::{
     CueBundle,
     ingame_setup,
     ingame_update,
+    cue_movement,
 };
 
 pub const GAMETITLE: &str = "Timing Game";
@@ -59,7 +60,10 @@ fn main() {
         .add_systems(Update, mainmenu_update.run_if(in_state(AppState::Mainmenu)))
         // Ingame
         .add_systems(OnEnter(AppState::Ingame), ingame_setup)
-        .add_systems(Update, ingame_update.run_if(in_state(AppState::Ingame)))
+        .add_systems(Update, (
+            ingame_update,
+            cue_movement,
+        ).run_if(in_state(AppState::Ingame)))
         .run();
 }
 
