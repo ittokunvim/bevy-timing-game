@@ -1,10 +1,18 @@
 use bevy::prelude::*;
+use bevy_ecs_ldtk::prelude::*;
 
 mod mainmenu;
+mod ingame;
 
 use crate::mainmenu::{
     mainmenu_setup,
     mainmenu_update,
+};
+
+use crate::ingame::{
+    CueBundle,
+    ingame_setup,
+    ingame_update,
 };
 
 pub const GAMETITLE: &str = "Timing Game";
@@ -14,6 +22,7 @@ const BG_COLOR: Color = Color::srgb(0.25, 0.25, 0.25);
 pub const BG_IMAGE_PATH: &str = "images/mainmenu.png";
 pub const FONT_MEDIUM_PATH: &str = "fonts/FiraMono-Medium.ttf";
 pub const FONT_BOLD_PATH: &str = "fonts/FiraSans-Bold.ttf";
+pub const LDTK_PROJECT_PATH: &str = "bevy-timing-game.ldtk";
 
 #[derive(States, Default, Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AppState {
@@ -39,9 +48,18 @@ fn main() {
         .init_state::<AppState>()
         .insert_resource(ClearColor(BG_COLOR))
         .insert_resource(Time::<Fixed>::from_seconds(1.0 / 60.0))
+        // Ldtk setup
+        .add_plugins(LdtkPlugin)
+        .insert_resource(LevelSelection::index(0))
+        .register_ldtk_entity::<CueBundle>("Cue")
+        // Setup
         .add_systems(Startup, setup_camera)
+        // Mainmenu
         .add_systems(OnEnter(AppState::Mainmenu), mainmenu_setup)
         .add_systems(Update, mainmenu_update.run_if(in_state(AppState::Mainmenu)))
+        // Ingame
+        .add_systems(OnEnter(AppState::Ingame), ingame_setup)
+        .add_systems(Update, ingame_update.run_if(in_state(AppState::Ingame)))
         .run();
 }
 
