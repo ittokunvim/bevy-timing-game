@@ -81,3 +81,29 @@ pub fn cue_movement(
         cue_transform.translation.x += if cue.toggle_move { CUE_SPEED } else { -CUE_SPEED };
     }
 }
+
+pub fn decide_timing(
+    mouse_event: Res<ButtonInput<MouseButton>>,
+    cue_query: Query<&Transform, With<Cue>>,
+    bar_query: Query<&Transform, (With<Bar>, Without<Cue>)>,
+) {
+    if !mouse_event.just_pressed(MouseButton::Left) { return }
+
+    let bar_transform = bar_query.single();
+    let bar_x = bar_transform.translation.x; // 320
+    let cue_transform = cue_query.single();
+    let cue_x = cue_transform.translation.x;
+
+
+    if cue_x < bar_x + GRID_SIZE as f32 && cue_x > bar_x - GRID_SIZE as f32 {
+        println!("perfect!");
+        println!("bar_x: {}, cue_x: {}", bar_x, cue_x);
+    }
+    else if cue_x < bar_x + (GRID_SIZE * 2) as f32 && cue_x > bar_x - (GRID_SIZE * 2) as f32 {
+        println!("good!");
+        println!("bar_x: {}, cue_x: {}", bar_x, cue_x);
+    }
+    else {
+        println!("bad...");
+    }
+}
