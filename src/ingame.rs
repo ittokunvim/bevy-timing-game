@@ -9,10 +9,14 @@ use crate::{
 
 const GRID_SIZE: i32 = 16;
 
-const CUE_SPEED: f32 = 2.0;
+const CUE_SPEED: f32 = 4.0;
 
 const BAR_COLOR: Color = Color::srgb(0.25, 0.25, 0.25);
 const BAR_SIZE: Vec2 = Vec2::new((GRID_SIZE * 32) as f32, (GRID_SIZE * 2) as f32);
+
+const SCOREBOARD_FONT_SIZE: f32 = 24.0;
+const SCOREBOARD_COLOR: Color = Color::srgb(0.1, 0.1, 0.1);
+const SCOREBOARD_PADDING: Val = Val::Px(5.0);
 
 #[derive(Default, Component, Debug)]
 pub struct Cue {
@@ -34,6 +38,12 @@ pub struct DecideEvent;
 
 #[derive(Resource, Deref)]
 pub struct DecideSound(Handle<AudioSource>);
+
+#[derive(Resource, Deref, DerefMut)]
+pub struct Score(pub usize);
+
+#[derive(Component)]
+pub struct ScoreboardUi;
 
 pub fn ingame_setup(
     mut commands: Commands,
@@ -71,6 +81,31 @@ pub fn ingame_setup(
         },
         Bar,
     ));
+    // Scoreboard
+    commands.spawn((
+        TextBundle::from_sections([
+            TextSection::new(
+                "Score: ", 
+                TextStyle {
+                    font_size: SCOREBOARD_FONT_SIZE,
+                    color: SCOREBOARD_COLOR,
+                    ..default()
+                },
+            ),
+            TextSection::from_style(TextStyle {
+                font_size: SCOREBOARD_FONT_SIZE,
+                color: SCOREBOARD_COLOR,
+                ..default()
+            }),
+        ])
+        .with_style(Style {
+            position_type: PositionType::Absolute,
+            top: SCOREBOARD_PADDING,
+            left: SCOREBOARD_PADDING,
+            ..default()
+        }),
+        ScoreboardUi,
+    ));
 }
 
 pub fn ingame_update() {}
@@ -97,6 +132,7 @@ pub fn decide_timing(
     cue_query: Query<&Transform, With<Cue>>,
     bar_query: Query<&Transform, (With<Bar>, Without<Cue>)>,
     mut decide_events: EventWriter<DecideEvent>,
+    mut score: ResMut<Score>,
 ) {
     if !mouse_event.just_pressed(MouseButton::Left) { return }
 
@@ -108,15 +144,16 @@ pub fn decide_timing(
     let cue_x = cue_transform.translation.x;
 
     if cue_x < bar_x + GRID_SIZE as f32 && cue_x > bar_x - GRID_SIZE as f32 {
-        println!("perfect!");
         println!("bar_x: {}, cue_x: {}", bar_x, cue_x);
+        **score += 3;
     }
     else if cue_x < bar_x + (GRID_SIZE * 2) as f32 && cue_x > bar_x - (GRID_SIZE * 2) as f32 {
-        println!("good!");
         println!("bar_x: {}, cue_x: {}", bar_x, cue_x);
+        **score += 2;
     }
     else {
-        println!("bad...");
+        println!("bar_x: {}, cue_x: {}", bar_x, cue_x);
+        if **score > 0 { **score -= 1 };
     }
 }
 
@@ -132,4 +169,12 @@ pub fn play_decide_sound(
         source: sound.clone(),
         settings: PlaybackSettings::DESPAWN,
     });
+}
+
+pub fn update_scoreboard(
+    score: Res<Score>,
+    mut scoreboard_query: Query<&mut Text, With<ScoreboardUi>>,
+) {
+    let mut text = scoreboard_query.single_mut();
+    text.sections[1].value = score.to_string();
 }

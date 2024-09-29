@@ -12,11 +12,13 @@ use crate::mainmenu::{
 use crate::ingame::{
     CueBundle,
     DecideEvent,
+    Score,
     ingame_setup,
     ingame_update,
     cue_movement,
     decide_timing,
     play_decide_sound,
+    update_scoreboard,
 };
 
 pub const GAMETITLE: &str = "Timing Game";
@@ -53,6 +55,7 @@ fn main() {
         .init_state::<AppState>()
         .insert_resource(ClearColor(BG_COLOR))
         .insert_resource(Time::<Fixed>::from_seconds(1.0 / 60.0))
+        .insert_resource(Score(0))
         .add_event::<DecideEvent>()
         // Ldtk setup
         .add_plugins(LdtkPlugin)
@@ -70,6 +73,7 @@ fn main() {
             cue_movement,
             decide_timing,
             play_decide_sound,
+            update_scoreboard,
         ).run_if(in_state(AppState::Ingame)))
         .run();
 }
