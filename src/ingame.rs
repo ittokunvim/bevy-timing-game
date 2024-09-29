@@ -4,6 +4,7 @@ use bevy_ecs_ldtk::prelude::*;
 use crate::{
     WINDOW_SIZE,
     LDTK_PROJECT_PATH,
+    DECIDE_SOUND_PATH,
 };
 
 const GRID_SIZE: i32 = 16;
@@ -28,6 +29,12 @@ pub struct CueBundle {
     sprite_sheet_bundle: LdtkSpriteSheetBundle,
 }
 
+#[derive(Event, Default)]
+pub struct DecideEvent;
+
+#[derive(Resource, Deref)]
+pub struct DecideSound(Handle<AudioSource>);
+
 pub fn ingame_setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
@@ -46,6 +53,9 @@ pub fn ingame_setup(
 
     camera_transform.translation.x = WINDOW_SIZE.x / 2.0;
     camera_transform.translation.y = WINDOW_SIZE.y / 2.0;
+    // Sound
+    let cue_decide_sound = asset_server.load(DECIDE_SOUND_PATH);
+    commands.insert_resource(DecideSound(cue_decide_sound));
     // Bar
     let bar_y = WINDOW_SIZE.y - (GRID_SIZE * 4) as f32 - BAR_SIZE.y / 2.0;
 
@@ -86,14 +96,16 @@ pub fn decide_timing(
     mouse_event: Res<ButtonInput<MouseButton>>,
     cue_query: Query<&Transform, With<Cue>>,
     bar_query: Query<&Transform, (With<Bar>, Without<Cue>)>,
+    mut decide_events: EventWriter<DecideEvent>,
 ) {
     if !mouse_event.just_pressed(MouseButton::Left) { return }
+
+    decide_events.send_default();
 
     let bar_transform = bar_query.single();
     let bar_x = bar_transform.translation.x; // 320
     let cue_transform = cue_query.single();
     let cue_x = cue_transform.translation.x;
-
 
     if cue_x < bar_x + GRID_SIZE as f32 && cue_x > bar_x - GRID_SIZE as f32 {
         println!("perfect!");
@@ -106,4 +118,18 @@ pub fn decide_timing(
     else {
         println!("bad...");
     }
+}
+
+pub fn play_decide_sound(
+    mut commands: Commands,
+    mut decide_events: EventReader<DecideEvent>,
+    sound: Res<DecideSound>,
+) {
+    if decide_events.is_empty() { return }
+
+    decide_events.clear();
+    commands.spawn(AudioBundle {
+        source: sound.clone(),
+        settings: PlaybackSettings::DESPAWN,
+    });
 }

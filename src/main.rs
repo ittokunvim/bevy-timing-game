@@ -11,10 +11,12 @@ use crate::mainmenu::{
 
 use crate::ingame::{
     CueBundle,
+    DecideEvent,
     ingame_setup,
     ingame_update,
     cue_movement,
     decide_timing,
+    play_decide_sound,
 };
 
 pub const GAMETITLE: &str = "Timing Game";
@@ -25,6 +27,7 @@ pub const BG_IMAGE_PATH: &str = "images/mainmenu.png";
 pub const FONT_MEDIUM_PATH: &str = "fonts/FiraMono-Medium.ttf";
 pub const FONT_BOLD_PATH: &str = "fonts/FiraSans-Bold.ttf";
 pub const LDTK_PROJECT_PATH: &str = "bevy-timing-game.ldtk";
+pub const DECIDE_SOUND_PATH: &str = "sounds/timing.ogg";
 
 #[derive(States, Default, Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AppState {
@@ -50,6 +53,7 @@ fn main() {
         .init_state::<AppState>()
         .insert_resource(ClearColor(BG_COLOR))
         .insert_resource(Time::<Fixed>::from_seconds(1.0 / 60.0))
+        .add_event::<DecideEvent>()
         // Ldtk setup
         .add_plugins(LdtkPlugin)
         .insert_resource(LevelSelection::index(0))
@@ -65,6 +69,7 @@ fn main() {
             ingame_update,
             cue_movement,
             decide_timing,
+            play_decide_sound,
         ).run_if(in_state(AppState::Ingame)))
         .run();
 }
