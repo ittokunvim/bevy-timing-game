@@ -2,7 +2,8 @@ use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
 mod mainmenu;
-mod ingame;
+pub mod ingame;
+mod gameover;
 
 use crate::mainmenu::{
     mainmenu_setup,
@@ -22,6 +23,11 @@ use crate::ingame::{
     play_decide_sound,
     update_scoreboard,
     update_gametimer,
+};
+
+use crate::gameover::{
+    gameover_setup,
+    gameover_update,
 };
 
 pub const GAMETITLE: &str = "Timing Game";
@@ -80,6 +86,9 @@ fn main() {
             update_scoreboard,
             update_gametimer,
         ).run_if(in_state(AppState::Ingame)))
+        // Gameover
+        .add_systems(OnEnter(AppState::Gameover), gameover_setup)
+        .add_systems(Update, gameover_update.run_if(in_state(AppState::Gameover)))
         .run();
 }
 

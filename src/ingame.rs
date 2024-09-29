@@ -14,10 +14,10 @@ const GRID_SIZE: i32 = 16;
 
 pub const GAMETIME_LIMIT: f32 = 10.0;
 
-const CUE_SPEED: f32 = 4.0;
+const CUE_SPEED: f32 = 7.0;
 
 const BAR_COLOR: Color = Color::srgb(0.25, 0.25, 0.25);
-const BAR_SIZE: Vec2 = Vec2::new((GRID_SIZE * 32) as f32, (GRID_SIZE * 2) as f32);
+pub const BAR_SIZE: Vec2 = Vec2::new((GRID_SIZE * 32) as f32, (GRID_SIZE * 2) as f32);
 
 const SCOREBOARD_FONT_SIZE: f32 = 24.0;
 const SCOREBOARD_COLOR: Color = Color::srgb(0.1, 0.1, 0.1);
@@ -60,12 +60,13 @@ pub fn ingame_setup(
     ldtk_project_entities: Query<&Handle<LdtkProject>>,
 ) {
     // Ldtk project
-    if ldtk_project_entities.is_empty() {
-        commands.spawn(LdtkWorldBundle {
-            ldtk_handle: asset_server.load(LDTK_PROJECT_PATH),
-            ..Default::default()
-        });
-    }
+    if !ldtk_project_entities.is_empty() { return }
+
+    commands.spawn(LdtkWorldBundle {
+        ldtk_handle: asset_server.load(LDTK_PROJECT_PATH),
+        ..Default::default()
+    });
+
     // Camera
     let mut camera_transform = camera_query.single_mut();
 
