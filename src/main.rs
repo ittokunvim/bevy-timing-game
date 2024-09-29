@@ -10,15 +10,18 @@ use crate::mainmenu::{
 };
 
 use crate::ingame::{
+    GAMETIME_LIMIT,
     CueBundle,
     DecideEvent,
     Score,
+    GameTimer,
     ingame_setup,
     ingame_update,
     cue_movement,
     decide_timing,
     play_decide_sound,
     update_scoreboard,
+    update_gametimer,
 };
 
 pub const GAMETITLE: &str = "Timing Game";
@@ -57,6 +60,7 @@ fn main() {
         .insert_resource(Time::<Fixed>::from_seconds(1.0 / 60.0))
         .insert_resource(Score(0))
         .add_event::<DecideEvent>()
+        .insert_resource(GameTimer(Timer::from_seconds(GAMETIME_LIMIT, TimerMode::Once)))
         // Ldtk setup
         .add_plugins(LdtkPlugin)
         .insert_resource(LevelSelection::index(0))
@@ -74,6 +78,7 @@ fn main() {
             decide_timing,
             play_decide_sound,
             update_scoreboard,
+            update_gametimer,
         ).run_if(in_state(AppState::Ingame)))
         .run();
 }

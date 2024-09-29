@@ -3,11 +3,16 @@ use bevy_ecs_ldtk::prelude::*;
 
 use crate::{
     WINDOW_SIZE,
+    FONT_BOLD_PATH,
+    FONT_MEDIUM_PATH,
     LDTK_PROJECT_PATH,
     DECIDE_SOUND_PATH,
+    AppState,
 };
 
 const GRID_SIZE: i32 = 16;
+
+pub const GAMETIME_LIMIT: f32 = 10.0;
 
 const CUE_SPEED: f32 = 4.0;
 
@@ -44,6 +49,9 @@ pub struct Score(pub usize);
 
 #[derive(Component)]
 pub struct ScoreboardUi;
+
+#[derive(Resource)]
+pub struct GameTimer(pub Timer);
 
 pub fn ingame_setup(
     mut commands: Commands,
@@ -87,12 +95,26 @@ pub fn ingame_setup(
             TextSection::new(
                 "Score: ", 
                 TextStyle {
+                    font: asset_server.load(FONT_BOLD_PATH),
                     font_size: SCOREBOARD_FONT_SIZE,
                     color: SCOREBOARD_COLOR,
-                    ..default()
                 },
             ),
             TextSection::from_style(TextStyle {
+                font: asset_server.load(FONT_MEDIUM_PATH),
+                font_size: SCOREBOARD_FONT_SIZE,
+                color: SCOREBOARD_COLOR,
+            }),
+            TextSection::new(
+                " | Time: ", 
+                TextStyle {
+                    font: asset_server.load(FONT_BOLD_PATH),
+                    font_size: SCOREBOARD_FONT_SIZE,
+                    color: SCOREBOARD_COLOR,
+                },
+            ),
+            TextSection::from_style(TextStyle {
+                font: asset_server.load(FONT_MEDIUM_PATH),
                 font_size: SCOREBOARD_FONT_SIZE,
                 color: SCOREBOARD_COLOR,
                 ..default()
@@ -173,8 +195,21 @@ pub fn play_decide_sound(
 
 pub fn update_scoreboard(
     score: Res<Score>,
+    timer: ResMut<GameTimer>,
     mut scoreboard_query: Query<&mut Text, With<ScoreboardUi>>,
 ) {
     let mut text = scoreboard_query.single_mut();
     text.sections[1].value = score.to_string();
+    text.sections[3].value = timer.0.remaining_secs().round().to_string();
+}
+
+pub fn update_gametimer(
+    time: Res<Time>,
+    mut timer: ResMut<GameTimer>,
+    mut app_state: ResMut<NextState<AppState>>,
+) {
+    if timer.0.tick(time.delta()).just_finished() {
+        timer.0.reset();
+        app_state.set(AppState::Gameover);
+    }
 }
