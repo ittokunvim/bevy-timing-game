@@ -30,3 +30,5 @@ LDtkアセット [SunnyLand](https://ansimuz.itch.io/sunny-land-pixel-game-art)
 効果音 [効果音ラボ](https://soundeffect-lab.info)
 
 画像編集 [Pixlr](https://pixlr.com)
+
+Wasm変換 [wasm-bindgen](https://github.com/rustwasm/wasm-bindgen)
