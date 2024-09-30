@@ -1,0 +1,13 @@
+[tasks.build_release]
+command = "cargo"
+args = ["build", "--release", "--target", "wasm32-unknown-unknown"]
+
+[tasks.build_wasm]
+command = "wasm-bindgen"
+args = ["--target", "web", "--out-dir", "./wasm", "target/wasm32-unknown-unknown/release/bevy-timing-game.wasm"]
+
+[tasks.wasm]
+dependencies = [
+	"build_release",
+	"build_wasm",
+]
