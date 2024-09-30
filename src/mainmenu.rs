@@ -3,9 +3,9 @@ use bevy::prelude::*;
 use crate::{
     GAMETITLE,
     WINDOW_SIZE,
-    BG_IMAGE_PATH,
-    FONT_MEDIUM_PATH,
-    FONT_BOLD_PATH,
+    PATH_BG_IMAGE,
+    PATH_FONT_MEDIUM,
+    PATH_FONT_BOLD,
     AppState,
 };
 
@@ -27,7 +27,7 @@ fn mainmenu_setup(
         TextBundle::from_section(
             GAMETITLE,
             TextStyle {
-                font: asset_server.load(FONT_BOLD_PATH),
+                font: asset_server.load(PATH_FONT_BOLD),
                 font_size: GAMETITLE_FONT_SIZE,
                 color: GAMETITLE_COLOR,
             }
@@ -45,7 +45,7 @@ fn mainmenu_setup(
         TextBundle::from_section(
             CLICKSTART_TEXT,
             TextStyle {
-                font: asset_server.load(FONT_MEDIUM_PATH),
+                font: asset_server.load(PATH_FONT_MEDIUM),
                 font_size: CLICKSTART_FONT_SIZE,
                 color: CLICKSTART_COLOR,
             },

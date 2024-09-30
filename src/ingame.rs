@@ -3,10 +3,10 @@ use bevy_ecs_ldtk::prelude::*;
 
 use crate::{
     WINDOW_SIZE,
-    FONT_BOLD_PATH,
-    FONT_MEDIUM_PATH,
-    LDTK_PROJECT_PATH,
-    DECIDE_SOUND_PATH,
+    PATH_FONT_BOLD,
+    PATH_FONT_MEDIUM,
+    PATH_LDTK_PROJECT,
+    PATH_SOUND_DECIDE,
     AppState,
     Score,
 };
@@ -59,7 +59,7 @@ fn ingame_setup(
     if !ldtk_project_entities.is_empty() { return }
 
     commands.spawn(LdtkWorldBundle {
-        ldtk_handle: asset_server.load(LDTK_PROJECT_PATH),
+        ldtk_handle: asset_server.load(PATH_LDTK_PROJECT),
         ..Default::default()
     });
 
@@ -69,7 +69,7 @@ fn ingame_setup(
     camera_transform.translation.x = WINDOW_SIZE.x / 2.0;
     camera_transform.translation.y = WINDOW_SIZE.y / 2.0;
     // Sound
-    let cue_decide_sound = asset_server.load(DECIDE_SOUND_PATH);
+    let cue_decide_sound = asset_server.load(PATH_SOUND_DECIDE);
     commands.insert_resource(DecideSound(cue_decide_sound));
     // Bar
     let bar_y = WINDOW_SIZE.y - (GRID_SIZE * 4) as f32 - BAR_SIZE.y / 2.0;
@@ -92,26 +92,26 @@ fn ingame_setup(
             TextSection::new(
                 SCOREBOARD_SCORE_TEXT,
                 TextStyle {
-                    font: asset_server.load(FONT_BOLD_PATH),
+                    font: asset_server.load(PATH_FONT_BOLD),
                     font_size: SCOREBOARD_FONT_SIZE,
                     color: SCOREBOARD_COLOR,
                 },
             ),
             TextSection::from_style(TextStyle {
-                font: asset_server.load(FONT_MEDIUM_PATH),
+                font: asset_server.load(PATH_FONT_MEDIUM),
                 font_size: SCOREBOARD_FONT_SIZE,
                 color: SCOREBOARD_COLOR,
             }),
             TextSection::new(
                 SCOREBOARD_TIME_TEXT,
                 TextStyle {
-                    font: asset_server.load(FONT_BOLD_PATH),
+                    font: asset_server.load(PATH_FONT_BOLD),
                     font_size: SCOREBOARD_FONT_SIZE,
                     color: SCOREBOARD_COLOR,
                 },
             ),
             TextSection::from_style(TextStyle {
-                font: asset_server.load(FONT_MEDIUM_PATH),
+                font: asset_server.load(PATH_FONT_MEDIUM),
                 font_size: SCOREBOARD_FONT_SIZE,
                 color: SCOREBOARD_COLOR,
                 ..default()

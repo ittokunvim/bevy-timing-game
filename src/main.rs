@@ -7,13 +7,13 @@ mod gameover;
 
 pub const GAMETITLE: &str = "Timing Game";
 pub const WINDOW_SIZE: Vec2 = Vec2::new(640.0, 480.0);
-const BG_COLOR: Color = Color::srgb(0.25, 0.25, 0.25);
+pub const PATH_BG_IMAGE: &str = "images/mainmenu.png";
+pub const PATH_FONT_MEDIUM: &str = "fonts/FiraMono-Medium.ttf";
+pub const PATH_FONT_BOLD: &str = "fonts/FiraSans-Bold.ttf";
+pub const PATH_LDTK_PROJECT: &str = "bevy-timing-game.ldtk";
+pub const PATH_SOUND_DECIDE: &str = "sounds/timing.ogg";
 
-pub const BG_IMAGE_PATH: &str = "images/mainmenu.png";
-pub const FONT_MEDIUM_PATH: &str = "fonts/FiraMono-Medium.ttf";
-pub const FONT_BOLD_PATH: &str = "fonts/FiraSans-Bold.ttf";
-pub const LDTK_PROJECT_PATH: &str = "bevy-timing-game.ldtk";
-pub const DECIDE_SOUND_PATH: &str = "sounds/timing.ogg";
+const BG_COLOR: Color = Color::srgb(0.25, 0.25, 0.25);
 
 #[derive(States, Default, Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AppState {
