@@ -11,13 +11,14 @@ use crate::{
 
 const GAMETITLE_FONT_SIZE: f32 = 40.0;
 const GAMETITLE_COLOR: Color = Color::srgb(0.1, 0.1, 0.1);
+const CLICKSTART_TEXT: &str = "Click Start...";
 const CLICKSTART_FONT_SIZE: f32 = 30.0;
 const CLICKSTART_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
 
 #[derive(Component)]
-pub struct Mainmenu;
+struct Mainmenu;
 
-pub fn mainmenu_setup(
+fn mainmenu_setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
 ) {
@@ -39,18 +40,10 @@ pub fn mainmenu_setup(
         }),
         Mainmenu,
     ));
-    // Background image
-    commands.spawn((
-        SpriteBundle {
-            texture: asset_server.load(BG_IMAGE_PATH),
-            ..default()
-        },
-        Mainmenu,
-    ));
     // Click Start
     commands.spawn((
         TextBundle::from_section(
-            "click start ...",
+            CLICKSTART_TEXT,
             TextStyle {
                 font: asset_server.load(FONT_MEDIUM_PATH),
                 font_size: CLICKSTART_FONT_SIZE,
@@ -65,9 +58,17 @@ pub fn mainmenu_setup(
         }),
         Mainmenu,
     ));
+    // Background image
+    commands.spawn((
+        SpriteBundle {
+            texture: asset_server.load(PATH_BG_IMAGE),
+            ..default()
+        },
+        Mainmenu,
+    ));
 }
 
-pub fn mainmenu_update(
+fn mainmenu_update(
     mouse_event: Res<ButtonInput<MouseButton>>,
     mainmenu_query: Query<Entity, With<Mainmenu>>,
     mut commands: Commands,
@@ -80,5 +81,15 @@ pub fn mainmenu_update(
         }
         // Changed app state
         app_state.set(AppState::Ingame);
+    }
+}
+
+pub struct MainmenuPlugin;
+
+impl Plugin for MainmenuPlugin {
+    fn build(&self, app: &mut App) {
+        app
+            .add_systems(OnEnter(AppState::Mainmenu), mainmenu_setup)
+            .add_systems(Update, mainmenu_update.run_if(in_state(AppState::Mainmenu)));
     }
 }

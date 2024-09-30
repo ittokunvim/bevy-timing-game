@@ -1,34 +1,9 @@
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
-mod mainmenu;
 pub mod ingame;
+mod mainmenu;
 mod gameover;
-
-use crate::mainmenu::{
-    mainmenu_setup,
-    mainmenu_update,
-};
-
-use crate::ingame::{
-    GAMETIME_LIMIT,
-    CueBundle,
-    DecideEvent,
-    Score,
-    GameTimer,
-    ingame_setup,
-    ingame_update,
-    cue_movement,
-    decide_timing,
-    play_decide_sound,
-    update_scoreboard,
-    update_gametimer,
-};
-
-use crate::gameover::{
-    gameover_setup,
-    gameover_update,
-};
 
 pub const GAMETITLE: &str = "Timing Game";
 pub const WINDOW_SIZE: Vec2 = Vec2::new(640.0, 480.0);
@@ -48,6 +23,9 @@ pub enum AppState {
     Gameover
 }
 
+#[derive(Resource, Deref, DerefMut)]
+pub struct Score(pub usize);
+
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins
@@ -65,30 +43,14 @@ fn main() {
         .insert_resource(ClearColor(BG_COLOR))
         .insert_resource(Time::<Fixed>::from_seconds(1.0 / 60.0))
         .insert_resource(Score(0))
-        .add_event::<DecideEvent>()
-        .insert_resource(GameTimer(Timer::from_seconds(GAMETIME_LIMIT, TimerMode::Once)))
         // Ldtk setup
         .add_plugins(LdtkPlugin)
         .insert_resource(LevelSelection::index(0))
-        .register_ldtk_entity::<CueBundle>("Cue")
-        // Setup
+        // Plugins
         .add_systems(Startup, setup_camera)
-        // Mainmenu
-        .add_systems(OnEnter(AppState::Mainmenu), mainmenu_setup)
-        .add_systems(Update, mainmenu_update.run_if(in_state(AppState::Mainmenu)))
-        // Ingame
-        .add_systems(OnEnter(AppState::Ingame), ingame_setup)
-        .add_systems(Update, (
-            ingame_update,
-            cue_movement,
-            decide_timing,
-            play_decide_sound,
-            update_scoreboard,
-            update_gametimer,
-        ).run_if(in_state(AppState::Ingame)))
-        // Gameover
-        .add_systems(OnEnter(AppState::Gameover), gameover_setup)
-        .add_systems(Update, gameover_update.run_if(in_state(AppState::Gameover)))
+        .add_plugins(mainmenu::MainmenuPlugin)
+        .add_plugins(ingame::IngamePlugin)
+        .add_plugins(gameover::GameoverPlugin)
         .run();
 }
 

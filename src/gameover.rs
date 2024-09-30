@@ -3,22 +3,20 @@ use bevy::prelude::*;
 use crate::{
     WINDOW_SIZE,
     AppState,
-};
-
-use crate::ingame::{
-    BAR_SIZE,
-    Cue,
-    Bar,
     Score,
 };
 
-const GAMEOVER_FONT_SIZE: f32 = 32.0;
 const FONT_COLOR: Color = Color::srgb(0.1, 0.1, 0.1);
+const TEXT_GAP: f32 = 64.0;
+const GAMEOVER_TEXT: &str = "Game Over...";
+const GAMECLEAR_TEXT: &str = "Game Clear!!";
+const GAMEOVER_FONT_SIZE: f32 = 32.0;
+const SCORE_TEXT: &str = "Score: ";
+const SCORE_FONT_SIZE: f32 = 24.0;
+const RESTART_TEXT: &str = "Click to Restart";
+const RESTART_FONT_SIZE: f32 = 24.0;
 const BG_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
 const BG_SIZE: Vec2 = Vec2::new(240.0, 240.0);
-const TEXT_GAP: f32 = 64.0;
-const SCORE_FONT_SIZE: f32 = 24.0;
-const RESTART_FONT_SIZE: f32 = 24.0;
 
 #[derive(Component)]
 pub struct Gameover;
@@ -29,7 +27,7 @@ pub fn gameover_setup(
     score: Res<Score>,
 ) {
     // Gameover
-    let gameover_text = if **score <= 10 { "Game Over..." } else { "Game Clear!!!" };
+    let gameover_text = if **score <= 10 { GAMEOVER_TEXT } else { GAMECLEAR_TEXT };
 
     commands.spawn((
         TextBundle::from_section(
@@ -51,7 +49,7 @@ pub fn gameover_setup(
     // Score
     commands.spawn((
         TextBundle::from_section(
-            format!("Score: {}", score.to_string()),
+            format!("{}{}", SCORE_TEXT, score.to_string()),
             TextStyle {
                 font: asset_server.load("fonts/FiraMono-Medium.ttf"),
                 font_size: SCORE_FONT_SIZE,
@@ -69,7 +67,7 @@ pub fn gameover_setup(
     // Click to Restart
     commands.spawn((
         TextBundle::from_section(
-            "Click to Restart",
+            RESTART_TEXT,
             TextStyle {
                 font: asset_server.load("fonts/FiraMono-Medium.ttf"),
                 font_size: RESTART_FONT_SIZE,
@@ -111,8 +109,6 @@ pub fn gameover_update(
     gameover_query: Query<Entity, With<Gameover>>,
     mut commands: Commands,
     mut score: ResMut<Score>,
-    mut cue_query: Query<&mut Transform, With<Cue>>,
-    bar_query: Query<&Transform, (With<Bar>, Without<Cue>)>,
     mut app_state: ResMut<NextState<AppState>>,
 ) {
     // Mouse clicked
@@ -123,13 +119,18 @@ pub fn gameover_update(
         }
         // Reset score
         **score = 0;
-        // Reset cue position
-        let bar_transform = bar_query.single();
-
-        for mut cue_transform in &mut cue_query {
-            cue_transform.translation.x = bar_transform.translation.x + BAR_SIZE.x / 2.0;
-        }
         // Moved app state to ingame
         app_state.set(AppState::Ingame);
+    }
+}
+
+pub struct GameoverPlugin;
+
+impl Plugin for GameoverPlugin {
+    fn build(&self, app: &mut App) {
+        app
+            .add_systems(OnEnter(AppState::Gameover), gameover_setup)
+            .add_systems(Update, gameover_update.run_if(in_state(AppState::Gameover)));
+ 
     }
 }

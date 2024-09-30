@@ -8,52 +8,48 @@ use crate::{
     LDTK_PROJECT_PATH,
     DECIDE_SOUND_PATH,
     AppState,
+    Score,
 };
 
 const GRID_SIZE: i32 = 16;
-
-pub const GAMETIME_LIMIT: f32 = 10.0;
-
+const GAMETIME_LIMIT: f32 = 10.0;
 const CUE_SPEED: f32 = 7.0;
-
 const BAR_COLOR: Color = Color::srgb(0.25, 0.25, 0.25);
-pub const BAR_SIZE: Vec2 = Vec2::new((GRID_SIZE * 32) as f32, (GRID_SIZE * 2) as f32);
-
+const BAR_SIZE: Vec2 = Vec2::new((GRID_SIZE * 32) as f32, (GRID_SIZE * 2) as f32);
 const SCOREBOARD_FONT_SIZE: f32 = 24.0;
 const SCOREBOARD_COLOR: Color = Color::srgb(0.1, 0.1, 0.1);
 const SCOREBOARD_PADDING: Val = Val::Px(5.0);
+const SCOREBOARD_SCORE_TEXT: &str = "Score: ";
+const SCOREBOARD_TIME_TEXT: &str = " | Time: ";
 
 #[derive(Default, Component, Debug)]
-pub struct Cue {
+struct Cue {
     toggle_move: bool,
 }
 
 #[derive(Default, Component)]
-pub struct Bar;
+struct Bar;
 
 #[derive(Default, Bundle, LdtkEntity)]
-pub struct CueBundle {
+struct CueBundle {
     cue: Cue,
     #[sprite_sheet_bundle]
     sprite_sheet_bundle: LdtkSpriteSheetBundle,
 }
 
 #[derive(Event, Default)]
-pub struct DecideEvent;
+struct DecideEvent;
 
 #[derive(Resource, Deref)]
-pub struct DecideSound(Handle<AudioSource>);
-
-#[derive(Resource, Deref, DerefMut)]
-pub struct Score(pub usize);
+struct DecideSound(Handle<AudioSource>);
 
 #[derive(Component)]
-pub struct ScoreboardUi;
+struct ScoreboardUi;
 
 #[derive(Resource)]
-pub struct GameTimer(pub Timer);
+struct GameTimer(Timer);
 
-pub fn ingame_setup(
+fn ingame_setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut camera_query: Query<&mut Transform, With<Camera2d>>,
@@ -94,7 +90,7 @@ pub fn ingame_setup(
     commands.spawn((
         TextBundle::from_sections([
             TextSection::new(
-                "Score: ", 
+                SCOREBOARD_SCORE_TEXT,
                 TextStyle {
                     font: asset_server.load(FONT_BOLD_PATH),
                     font_size: SCOREBOARD_FONT_SIZE,
@@ -107,7 +103,7 @@ pub fn ingame_setup(
                 color: SCOREBOARD_COLOR,
             }),
             TextSection::new(
-                " | Time: ", 
+                SCOREBOARD_TIME_TEXT,
                 TextStyle {
                     font: asset_server.load(FONT_BOLD_PATH),
                     font_size: SCOREBOARD_FONT_SIZE,
@@ -131,9 +127,7 @@ pub fn ingame_setup(
     ));
 }
 
-pub fn ingame_update() {}
-
-pub fn cue_movement(
+fn cue_movement(
     mut cue_query: Query<(&mut Transform, &mut Cue), With<Cue>>,
     bar_query: Query<&Transform, (With<Bar>, Without<Cue>)>,
 ) {
@@ -150,7 +144,7 @@ pub fn cue_movement(
     }
 }
 
-pub fn decide_timing(
+fn decide_timing(
     mouse_event: Res<ButtonInput<MouseButton>>,
     cue_query: Query<&Transform, With<Cue>>,
     bar_query: Query<&Transform, (With<Bar>, Without<Cue>)>,
@@ -162,25 +156,22 @@ pub fn decide_timing(
     decide_events.send_default();
 
     let bar_transform = bar_query.single();
-    let bar_x = bar_transform.translation.x; // 320
+    let bar_x = bar_transform.translation.x;
     let cue_transform = cue_query.single();
     let cue_x = cue_transform.translation.x;
 
     if cue_x < bar_x + GRID_SIZE as f32 && cue_x > bar_x - GRID_SIZE as f32 {
-        println!("bar_x: {}, cue_x: {}", bar_x, cue_x);
         **score += 3;
     }
     else if cue_x < bar_x + (GRID_SIZE * 2) as f32 && cue_x > bar_x - (GRID_SIZE * 2) as f32 {
-        println!("bar_x: {}, cue_x: {}", bar_x, cue_x);
         **score += 2;
     }
     else {
-        println!("bar_x: {}, cue_x: {}", bar_x, cue_x);
         if **score > 0 { **score -= 1 };
     }
 }
 
-pub fn play_decide_sound(
+fn play_decide_sound(
     mut commands: Commands,
     mut decide_events: EventReader<DecideEvent>,
     sound: Res<DecideSound>,
@@ -194,7 +185,7 @@ pub fn play_decide_sound(
     });
 }
 
-pub fn update_scoreboard(
+fn update_scoreboard(
     score: Res<Score>,
     timer: ResMut<GameTimer>,
     mut scoreboard_query: Query<&mut Text, With<ScoreboardUi>>,
@@ -204,13 +195,42 @@ pub fn update_scoreboard(
     text.sections[3].value = timer.0.remaining_secs().round().to_string();
 }
 
-pub fn update_gametimer(
+fn update_gametimer(
     time: Res<Time>,
     mut timer: ResMut<GameTimer>,
+    mut cue_query: Query<&mut Transform, With<Cue>>,
+    bar_query: Query<&Transform, (With<Bar>, Without<Cue>)>,
     mut app_state: ResMut<NextState<AppState>>,
 ) {
     if timer.0.tick(time.delta()).just_finished() {
+        // Reset timer
         timer.0.reset();
+        // Reset cue position
+        let bar_transform = bar_query.single();
+
+        for mut cue_transform in &mut cue_query {
+            cue_transform.translation.x = bar_transform.translation.x + BAR_SIZE.x / 2.0;
+        }
+        // Move app state
         app_state.set(AppState::Gameover);
+    }
+}
+
+pub struct IngamePlugin;
+
+impl Plugin for IngamePlugin {
+    fn build(&self, app: &mut App) {
+        app
+            .add_event::<DecideEvent>()
+            .insert_resource(GameTimer(Timer::from_seconds(GAMETIME_LIMIT, TimerMode::Once)))
+            .register_ldtk_entity::<CueBundle>("Cue")
+            .add_systems(OnEnter(AppState::Ingame), ingame_setup)
+            .add_systems(Update, (
+                cue_movement,
+                decide_timing,
+                play_decide_sound,
+                update_scoreboard,
+                update_gametimer,
+            ).run_if(in_state(AppState::Ingame)));
     }
 }
