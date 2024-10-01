@@ -10,7 +10,7 @@ pub const WINDOW_SIZE: Vec2 = Vec2::new(640.0, 480.0);
 pub const PATH_BG_IMAGE: &str = "images/mainmenu.png";
 pub const PATH_FONT_MEDIUM: &str = "fonts/FiraMono-Medium.ttf";
 pub const PATH_FONT_BOLD: &str = "fonts/FiraSans-Bold.ttf";
-pub const PATH_LDTK_PROJECT: &str = "bevy-timing-game.ldtk";
+pub const PATH_LDTK_PROJECT: &str = "ldtk/bevy-timing-game.ldtk";
 pub const PATH_SOUND_DECIDE: &str = "sounds/timing.ogg";
 
 const BG_COLOR: Color = Color::srgb(0.25, 0.25, 0.25);

@@ -131,6 +131,5 @@ impl Plugin for GameoverPlugin {
         app
             .add_systems(OnEnter(AppState::Gameover), gameover_setup)
             .add_systems(Update, gameover_update.run_if(in_state(AppState::Gameover)));
- 
     }
 }
