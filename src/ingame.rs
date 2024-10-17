@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
+use bevy_hanabi::prelude::*;
 
 use crate::{
     WINDOW_SIZE,
@@ -216,6 +217,63 @@ fn update_gametimer(
     }
 }
 
+fn effect_decide(
+    mut effects: ResMut<Assets<EffectAsset>>,
+    mut decide_events: EventReader<DecideEvent>,
+    mut commands: Commands,
+    cue_query: Query<&Transform, With<Cue>>,
+) {
+    if decide_events.is_empty() { return; }
+
+    decide_events.clear();
+
+    let mut gradient = Gradient::new();
+    gradient.add_key(0.0, Vec4::new(0.0, 0.7, 0.0, 1.0));
+    gradient.add_key(1.0, Vec4::new(0.5, 0.5, 0.5, 0.0));
+
+    let writer = ExprWriter::new();
+
+    let age = writer.lit(0.0).expr();
+    let init_age = SetAttributeModifier::new(Attribute::AGE, age);
+
+    let lifetime = writer.lit(1.0).expr();
+    let init_lifetime = SetAttributeModifier::new(Attribute::LIFETIME, lifetime);
+
+    let init_pos = SetPositionCircleModifier {
+        center: writer.lit(Vec3::ZERO).expr(),
+        axis: writer.lit(Vec3::Z).expr(),
+        radius: writer.lit(5.0).expr(),
+        dimension: ShapeDimension::Surface,
+    };
+
+    let init_vel = SetVelocityCircleModifier {
+        center: writer.lit(Vec3::ZERO).expr(),
+        axis: writer.lit(Vec3::Z).expr(),
+        speed: writer.lit(10.0).expr(),
+    };
+
+    let effect = EffectAsset::new(vec![1024], Spawner::once(1000.0.into(), true), writer.finish())
+        .with_name("decide_effect")
+        .init(init_pos)
+        .init(init_vel)
+        .init(init_age)
+        .init(init_lifetime)
+        .render(SizeOverLifetimeModifier {
+            gradient: Gradient::constant(Vec2::splat(1.0)),
+            screen_space_size: false,
+        })
+        .render(ColorOverLifetimeModifier { gradient });
+
+    let effect_handle = effects.add(effect);
+    let cue_pos = cue_query.single().translation.truncate();
+
+    commands.spawn(ParticleEffectBundle {
+        effect: ParticleEffect::new(effect_handle).with_z_layer_2d(Some(10.0)),
+        transform: Transform::from_xyz(cue_pos.x, cue_pos.y, 0.0),
+        ..default()
+    });
+}
+
 pub struct IngamePlugin;
 
 impl Plugin for IngamePlugin {
@@ -231,6 +289,7 @@ impl Plugin for IngamePlugin {
                 play_decide_sound,
                 update_scoreboard,
                 update_gametimer,
+                effect_decide,
             ).run_if(in_state(AppState::Ingame)));
     }
 }

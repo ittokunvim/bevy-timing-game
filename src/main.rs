@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
+use bevy_hanabi::prelude::*;
 
 pub mod ingame;
 mod mainmenu;
@@ -46,6 +47,8 @@ fn main() {
         // Ldtk setup
         .add_plugins(LdtkPlugin)
         .insert_resource(LevelSelection::index(0))
+        // Hanabi setup
+        .add_plugins(HanabiPlugin)
         // Plugins
         .add_systems(Startup, setup_camera)
         .add_plugins(mainmenu::MainmenuPlugin)
