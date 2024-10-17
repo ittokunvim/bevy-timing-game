@@ -4,16 +4,20 @@
 
 ## ゲーム概要
 
-左右交互に動くキューをタイミングよく真ん中にクリックするゲーム。
+左右交互に動くキューをタイミングよく真ん中にクリックするゲームです。
 
 真ん中に近いほどより多くのポイントを得ることができ、
-制限時間10秒の間に10ポイント集めてゲームクリアを目指す。
+制限時間10秒の間に10ポイント集めてゲームクリアを目指します。
 
 ## ゲーム情報
 
 ゲームタイトル `Timing Game`
 
 画面サイズ `640x480`
+
+## 操作方法
+
+決定: 左クリック
 
 ## クレジット
 
@@ -24,6 +28,8 @@
 2Dレベルエディタ [LDtk](https://ldtk.io)
 
 LDtkプラグイン [bevy_ecs_ldtk](https://github.com/Trouv/bevy_ecs_ldtk)
+
+GPUパーティクルシステム [bevy_hanabi](https://github.com/djeedai/bevy_hanabi)
 
 LDtkアセット [SunnyLand](https://ansimuz.itch.io/sunny-land-pixel-game-art)
 
