@@ -22,6 +22,7 @@ const SCOREBOARD_COLOR: Color = Color::srgb(0.1, 0.1, 0.1);
 const SCOREBOARD_PADDING: Val = Val::Px(5.0);
 const SCOREBOARD_SCORE_TEXT: &str = "Score: ";
 const SCOREBOARD_TIME_TEXT: &str = " | Time: ";
+const MAX_EFFECT_CAPACITY: u32 = 4096;
 
 #[derive(Default, Component, Debug)]
 struct Cue {
@@ -49,6 +50,9 @@ struct ScoreboardUi;
 
 #[derive(Component)]
 struct DecideEffect;
+
+#[derive(Component)]
+struct ReversalEffect;
 
 #[derive(Resource)]
 struct GameTimer(Timer);
@@ -132,35 +136,33 @@ fn setup(
 }
 
 fn effect_setup(
+    ldtk_project_entities: Query<&Handle<LdtkProject>>,
     mut effects: ResMut<Assets<EffectAsset>>,
     mut commands: Commands,
 ) {
+    if !ldtk_project_entities.is_empty() { return }
+
+    // Decide effect
     let mut gradient = Gradient::new();
     gradient.add_key(0.0, Vec4::new(0.0, 0.7, 0.0, 1.0));
-    gradient.add_key(1.0, Vec4::new(0.5, 0.5, 0.5, 0.0));
-
+    gradient.add_key(1.0, Vec4::new(0.0, 0.7, 0.0, 0.0));
     let writer = ExprWriter::new();
-
     let age = writer.lit(0.0).expr();
     let init_age = SetAttributeModifier::new(Attribute::AGE, age);
-
     let lifetime = writer.lit(1.0).expr();
     let init_lifetime = SetAttributeModifier::new(Attribute::LIFETIME, lifetime);
-
     let init_pos = SetPositionCircleModifier {
         center: writer.lit(Vec3::ZERO).expr(),
         axis: writer.lit(Vec3::Z).expr(),
         radius: writer.lit(5.0).expr(),
         dimension: ShapeDimension::Surface,
     };
-
     let init_vel = SetVelocityCircleModifier {
         center: writer.lit(Vec3::ZERO).expr(),
         axis: writer.lit(Vec3::Z).expr(),
         speed: writer.lit(10.0).expr(),
     };
-
-    let effect = EffectAsset::new(vec![1024], Spawner::once(1000.0.into(), true), writer.finish())
+    let effect = EffectAsset::new(vec![MAX_EFFECT_CAPACITY], Spawner::once(1000.0.into(), true), writer.finish())
         .with_name("decide_effect")
         .init(init_pos)
         .init(init_vel)
@@ -171,7 +173,6 @@ fn effect_setup(
             screen_space_size: false,
         })
         .render(ColorOverLifetimeModifier { gradient });
-
     let effect_handle = effects.add(effect);
 
     commands.spawn((
@@ -181,23 +182,73 @@ fn effect_setup(
         },
         DecideEffect,
     ));
-}
+    // Reversal effect
+    let mut gradient = Gradient::new();
+    gradient.add_key(0.0, Vec4::new(0.7, 0.0, 0.0, 1.0));
+    gradient.add_key(0.8, Vec4::new(0.7, 0.0, 0.0, 0.5));
+    gradient.add_key(1.0, Vec4::new(0.7, 0.0, 0.0, 0.0));
+    let writer = ExprWriter::new();
+    let age = writer.lit(0.0).expr();
+    let init_age = SetAttributeModifier::new(Attribute::AGE, age);
+    let lifetime = writer.lit(1.0).expr();
+    let init_lifetime = SetAttributeModifier::new(Attribute::LIFETIME, lifetime);
+    let init_pos = SetPositionCone3dModifier {
+        base_radius: writer.lit(2.0).expr(),
+        top_radius: writer.lit(10.0).expr(),
+        height: writer.lit(10.0).expr(),
+        dimension: ShapeDimension::Volume,
+    };
+    let init_vel = SetVelocitySphereModifier {
+        center: writer.lit(Vec3::ZERO).expr(),
+        speed: writer.lit(20.0).expr(),
+    };
+    let size = (writer.rand(ScalarType::Float) * writer.lit(1.5) + writer.lit(1.5)).expr();
+    let init_size = SetAttributeModifier::new(Attribute::SIZE, size);
+    let effect = EffectAsset::new(vec![MAX_EFFECT_CAPACITY], Spawner::once(50.0.into(), false), writer.finish())
+        .with_name("reversal_effect")
+        .init(init_pos)
+        .init(init_vel)
+        .init(init_age)
+        .init(init_lifetime)
+        .init(init_size)
+        .render(ColorOverLifetimeModifier { gradient });
+    let effect_handle = effects.add(effect);
+
+    commands.spawn((
+        ParticleEffectBundle {
+            effect: ParticleEffect::new(effect_handle).with_z_layer_2d(Some(10.0)),
+            ..default()
+        },
+        ReversalEffect,
+    ));
+ }
 
 fn cue_movement(
     mut cue_query: Query<(&mut Transform, &mut Cue), With<Cue>>,
     bar_query: Query<&Transform, (With<Bar>, Without<Cue>)>,
+    mut effect: Query<(&mut EffectSpawner, &mut Transform), (With<ReversalEffect>, Without<Cue>, Without<Bar>)>,
 ) {
+    let Ok((mut cue_transform, mut cue)) = cue_query.get_single_mut() else { return; };
+    let cue_x = cue_transform.translation.x;
     let bar_transform = bar_query.single();
-    let bar_x = bar_transform.translation.x;
+    let (bar_x, bar_y) = (bar_transform.translation.x, bar_transform.translation.y);
 
-    for (mut cue_transform, mut cue) in &mut cue_query {
-        let cue_x = cue_transform.translation.x;
-
-        if cue_x > bar_x + BAR_SIZE.x / 2.0 || cue_x < bar_x - BAR_SIZE.x / 2.0 {
-            cue.toggle_move = !cue.toggle_move;
-        }
-        cue_transform.translation.x += if cue.toggle_move { CUE_SPEED } else { -CUE_SPEED };
+    if cue_x > bar_x + BAR_SIZE.x / 2.0 || cue_x < bar_x - BAR_SIZE.x / 2.0 {
+        // reversal movement
+        cue.toggle_move = !cue.toggle_move;
+        // reversal effect
+        let Ok((mut spawner, mut effect_transform)) = effect.get_single_mut() else { return; };
+        let transform_x = match cue.toggle_move {
+            true => bar_x - BAR_SIZE.x / 2.0,
+            false => bar_x + BAR_SIZE.x / 2.0,
+        };
+        let rotation_z = if cue.toggle_move { 1.5 } else { -1.5 };
+        effect_transform.translation = Vec3::new(transform_x, bar_y, 0.0);
+        effect_transform.rotation = Quat::from_rotation_z(rotation_z);
+        spawner.reset();
     }
+
+    cue_transform.translation.x += if cue.toggle_move { CUE_SPEED } else { -CUE_SPEED };
 }
 
 fn decide_timing(
