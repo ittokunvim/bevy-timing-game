@@ -47,10 +47,13 @@ struct DecideSound(Handle<AudioSource>);
 #[derive(Component)]
 struct ScoreboardUi;
 
+#[derive(Component)]
+struct DecideEffect;
+
 #[derive(Resource)]
 struct GameTimer(Timer);
 
-fn ingame_setup(
+fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut camera_query: Query<&mut Transform, With<Camera2d>>,
@@ -128,105 +131,10 @@ fn ingame_setup(
     ));
 }
 
-fn cue_movement(
-    mut cue_query: Query<(&mut Transform, &mut Cue), With<Cue>>,
-    bar_query: Query<&Transform, (With<Bar>, Without<Cue>)>,
-) {
-    let bar_transform = bar_query.single();
-    let bar_x = bar_transform.translation.x;
-
-    for (mut cue_transform, mut cue) in &mut cue_query {
-        let cue_x = cue_transform.translation.x;
-
-        if cue_x > bar_x + BAR_SIZE.x / 2.0 || cue_x < bar_x - BAR_SIZE.x / 2.0 {
-            cue.toggle_move = !cue.toggle_move;
-        }
-        cue_transform.translation.x += if cue.toggle_move { CUE_SPEED } else { -CUE_SPEED };
-    }
-}
-
-fn decide_timing(
-    mouse_event: Res<ButtonInput<MouseButton>>,
-    cue_query: Query<&Transform, With<Cue>>,
-    bar_query: Query<&Transform, (With<Bar>, Without<Cue>)>,
-    mut decide_events: EventWriter<DecideEvent>,
-    mut score: ResMut<Score>,
-) {
-    if !mouse_event.just_pressed(MouseButton::Left) { return }
-
-    decide_events.send_default();
-
-    let bar_transform = bar_query.single();
-    let bar_x = bar_transform.translation.x;
-    let cue_transform = cue_query.single();
-    let cue_x = cue_transform.translation.x;
-
-    if cue_x < bar_x + GRID_SIZE as f32 && cue_x > bar_x - GRID_SIZE as f32 {
-        **score += 3;
-    }
-    else if cue_x < bar_x + (GRID_SIZE * 2) as f32 && cue_x > bar_x - (GRID_SIZE * 2) as f32 {
-        **score += 2;
-    }
-    else {
-        if **score > 0 { **score -= 1 };
-    }
-}
-
-fn play_decide_sound(
-    mut commands: Commands,
-    mut decide_events: EventReader<DecideEvent>,
-    sound: Res<DecideSound>,
-) {
-    if decide_events.is_empty() { return }
-
-    decide_events.clear();
-    commands.spawn(AudioBundle {
-        source: sound.clone(),
-        settings: PlaybackSettings::DESPAWN,
-    });
-}
-
-fn update_scoreboard(
-    score: Res<Score>,
-    timer: ResMut<GameTimer>,
-    mut scoreboard_query: Query<&mut Text, With<ScoreboardUi>>,
-) {
-    let mut text = scoreboard_query.single_mut();
-    text.sections[1].value = score.to_string();
-    text.sections[3].value = timer.0.remaining_secs().round().to_string();
-}
-
-fn update_gametimer(
-    time: Res<Time>,
-    mut timer: ResMut<GameTimer>,
-    mut cue_query: Query<&mut Transform, With<Cue>>,
-    bar_query: Query<&Transform, (With<Bar>, Without<Cue>)>,
-    mut app_state: ResMut<NextState<AppState>>,
-) {
-    if timer.0.tick(time.delta()).just_finished() {
-        // Reset timer
-        timer.0.reset();
-        // Reset cue position
-        let bar_transform = bar_query.single();
-
-        for mut cue_transform in &mut cue_query {
-            cue_transform.translation.x = bar_transform.translation.x + BAR_SIZE.x / 2.0;
-        }
-        // Move app state
-        app_state.set(AppState::Gameover);
-    }
-}
-
-fn effect_decide(
+fn effect_setup(
     mut effects: ResMut<Assets<EffectAsset>>,
-    mut decide_events: EventReader<DecideEvent>,
     mut commands: Commands,
-    cue_query: Query<&Transform, With<Cue>>,
 ) {
-    if decide_events.is_empty() { return; }
-
-    decide_events.clear();
-
     let mut gradient = Gradient::new();
     gradient.add_key(0.0, Vec4::new(0.0, 0.7, 0.0, 1.0));
     gradient.add_key(1.0, Vec4::new(0.5, 0.5, 0.5, 0.0));
@@ -265,13 +173,116 @@ fn effect_decide(
         .render(ColorOverLifetimeModifier { gradient });
 
     let effect_handle = effects.add(effect);
-    let cue_pos = cue_query.single().translation.truncate();
 
-    commands.spawn(ParticleEffectBundle {
-        effect: ParticleEffect::new(effect_handle).with_z_layer_2d(Some(10.0)),
-        transform: Transform::from_xyz(cue_pos.x, cue_pos.y, 0.0),
-        ..default()
+    commands.spawn((
+        ParticleEffectBundle {
+            effect: ParticleEffect::new(effect_handle).with_z_layer_2d(Some(10.0)),
+            ..default()
+        },
+        DecideEffect,
+    ));
+}
+
+fn cue_movement(
+    mut cue_query: Query<(&mut Transform, &mut Cue), With<Cue>>,
+    bar_query: Query<&Transform, (With<Bar>, Without<Cue>)>,
+) {
+    let bar_transform = bar_query.single();
+    let bar_x = bar_transform.translation.x;
+
+    for (mut cue_transform, mut cue) in &mut cue_query {
+        let cue_x = cue_transform.translation.x;
+
+        if cue_x > bar_x + BAR_SIZE.x / 2.0 || cue_x < bar_x - BAR_SIZE.x / 2.0 {
+            cue.toggle_move = !cue.toggle_move;
+        }
+        cue_transform.translation.x += if cue.toggle_move { CUE_SPEED } else { -CUE_SPEED };
+    }
+}
+
+fn decide_timing(
+    mouse_event: Res<ButtonInput<MouseButton>>,
+    cue_query: Query<&Transform, With<Cue>>,
+    bar_query: Query<&Transform, (With<Bar>, Without<Cue>)>,
+    mut decide_events: EventWriter<DecideEvent>,
+    mut score: ResMut<Score>,
+) {
+    if !mouse_event.just_pressed(MouseButton::Left) { return }
+
+    decide_events.send_default();
+
+    let bar_x = bar_query.single().translation.x;
+    let cue_x = cue_query.single().translation.x;
+
+    if cue_x < bar_x + GRID_SIZE as f32 && cue_x > bar_x - GRID_SIZE as f32 {
+        **score += 3;
+    }
+    else if cue_x < bar_x + (GRID_SIZE * 2) as f32 && cue_x > bar_x - (GRID_SIZE * 2) as f32 {
+        **score += 2;
+    }
+    else {
+        if **score > 0 { **score -= 1 };
+    }
+}
+
+fn play_decide_sound(
+    mut commands: Commands,
+    mut decide_events: EventReader<DecideEvent>,
+    sound: Res<DecideSound>,
+) {
+    if decide_events.is_empty() { return }
+
+    decide_events.clear();
+    commands.spawn(AudioBundle {
+        source: sound.clone(),
+        settings: PlaybackSettings::DESPAWN,
     });
+}
+
+fn spawn_decide_effect(
+    mut effect: Query<(&mut EffectSpawner, &mut Transform), (With<DecideEffect>, Without<Cue>, Without<Bar>)>,
+    mut decide_events: EventReader<DecideEvent>,
+    cue_query: Query<&Transform, With<Cue>>,
+) {
+    if decide_events.is_empty() { return }
+
+    let Ok((mut spawner, mut effect_transform)) = effect.get_single_mut() else { return; };
+    let cue_transform = cue_query.single();
+
+    decide_events.clear();
+    effect_transform.translation = cue_transform.translation;
+    spawner.reset();
+}
+
+fn update_scoreboard(
+    score: Res<Score>,
+    timer: ResMut<GameTimer>,
+    mut scoreboard_query: Query<&mut Text, With<ScoreboardUi>>,
+) {
+    let mut text = scoreboard_query.single_mut();
+    text.sections[1].value = score.to_string();
+    text.sections[3].value = timer.0.remaining_secs().round().to_string();
+}
+
+fn update_gametimer(
+    time: Res<Time>,
+    mut timer: ResMut<GameTimer>,
+    mut cue_query: Query<&mut Transform, With<Cue>>,
+    bar_query: Query<&Transform, (With<Bar>, Without<Cue>)>,
+    mut app_state: ResMut<NextState<AppState>>,
+) {
+    if timer.0.tick(time.delta()).just_finished() {
+        // Reset timer
+        timer.0.reset();
+        // Reset cue position
+        let bar_transform = bar_query.single();
+
+        for mut cue_transform in &mut cue_query {
+            cue_transform.translation.x = bar_transform.translation.x + BAR_SIZE.x / 2.0;
+        }
+        // Move app state
+        app_state.set(AppState::Gameover);
+    }
 }
 
 pub struct IngamePlugin;
@@ -282,14 +293,17 @@ impl Plugin for IngamePlugin {
             .add_event::<DecideEvent>()
             .insert_resource(GameTimer(Timer::from_seconds(GAMETIME_LIMIT, TimerMode::Once)))
             .register_ldtk_entity::<CueBundle>("Cue")
-            .add_systems(OnEnter(AppState::Ingame), ingame_setup)
+            .add_systems(OnEnter(AppState::Ingame), (
+                setup,
+                effect_setup,
+            ))
             .add_systems(Update, (
                 cue_movement,
                 decide_timing,
                 play_decide_sound,
+                spawn_decide_effect,
                 update_scoreboard,
                 update_gametimer,
-                effect_decide,
             ).run_if(in_state(AppState::Ingame)));
     }
 }
