@@ -45,7 +45,8 @@ pub fn gameover_setup(
             ..default()
         }),
         Gameover,
-    ));
+    ))
+    .insert(Name::new("gameover"));
     // Score
     commands.spawn((
         TextBundle::from_section(
@@ -63,7 +64,8 @@ pub fn gameover_setup(
             ..default()
         }),
         Gameover,
-    ));
+    ))
+    .insert(Name::new("score"));
     // Click to Restart
     commands.spawn((
         TextBundle::from_section(
@@ -81,7 +83,8 @@ pub fn gameover_setup(
             ..default()
         }),
         Gameover,
-    ));
+    ))
+    .insert(Name::new("click_restart"));
     // Gameover background
     commands.spawn((
         SpriteBundle {
@@ -101,7 +104,8 @@ pub fn gameover_setup(
             ..default()
         },
         Gameover,
-    ));
+    ))
+        .insert(Name::new("bg_gameover"));
 }
 
 pub fn gameover_update(

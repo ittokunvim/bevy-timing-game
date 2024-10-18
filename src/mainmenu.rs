@@ -39,7 +39,8 @@ fn mainmenu_setup(
             ..default()
         }),
         Mainmenu,
-    ));
+    ))
+    .insert(Name::new("game_title"));
     // Click Start
     commands.spawn((
         TextBundle::from_section(
@@ -57,7 +58,8 @@ fn mainmenu_setup(
             ..default()
         }),
         Mainmenu,
-    ));
+    ))
+    .insert(Name::new("click_start"));
     // Background image
     commands.spawn((
         SpriteBundle {
@@ -65,7 +67,8 @@ fn mainmenu_setup(
             ..default()
         },
         Mainmenu,
-    ));
+    ))
+    .insert(Name::new("bg_image"));
 }
 
 fn mainmenu_update(

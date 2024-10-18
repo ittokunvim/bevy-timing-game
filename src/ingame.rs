@@ -69,7 +69,8 @@ fn setup(
     commands.spawn(LdtkWorldBundle {
         ldtk_handle: asset_server.load(PATH_LDTK_PROJECT),
         ..Default::default()
-    });
+    })
+    .insert(Name::new("ldtk"));
 
     // Camera
     let mut camera_transform = camera_query.single_mut();
@@ -93,7 +94,8 @@ fn setup(
             ..default()
         },
         Bar,
-    ));
+    ))
+    .insert(Name::new("bar"));
     // Scoreboard
     commands.spawn((
         TextBundle::from_sections([
@@ -132,7 +134,8 @@ fn setup(
             ..default()
         }),
         ScoreboardUi,
-    ));
+    ))
+    .insert(Name::new("scoreboard"));
 }
 
 fn effect_setup(
@@ -181,7 +184,8 @@ fn effect_setup(
             ..default()
         },
         DecideEffect,
-    ));
+    ))
+    .insert(Name::new("decide_effect"));
     // Reversal effect
     let mut gradient = Gradient::new();
     gradient.add_key(0.0, Vec4::new(0.7, 0.0, 0.0, 1.0));
@@ -220,7 +224,8 @@ fn effect_setup(
             ..default()
         },
         ReversalEffect,
-    ));
+    ))
+    .insert(Name::new("reversal_effect"));
  }
 
 fn cue_movement(

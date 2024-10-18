@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use bevy_hanabi::prelude::*;
+use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 pub mod ingame;
 mod mainmenu;
@@ -49,6 +50,8 @@ fn main() {
         .insert_resource(LevelSelection::index(0))
         // Hanabi setup
         .add_plugins(HanabiPlugin)
+        // Inspector setup
+        .add_plugins(WorldInspectorPlugin::new())
         // Plugins
         .add_systems(Startup, setup_camera)
         .add_plugins(mainmenu::MainmenuPlugin)
