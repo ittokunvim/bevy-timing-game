@@ -1,7 +1,4 @@
-use bevy::{
-    prelude::*,
-    window::PrimaryWindow,
-};
+use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 use bevy_hanabi::prelude::*;
 
@@ -16,6 +13,12 @@ use crate::{
     Score,
 };
 
+use crate::pause::{
+    PauseButton,
+    update_pausebtn,
+    get_pausebtn,
+};
+
 const GRID_SIZE: i32 = 16;
 const GAMETIME_LIMIT: f32 = 10.0;
 const CUE_SPEED: f32 = 7.0;
@@ -27,8 +30,6 @@ const SCOREBOARD_PADDING: Val = Val::Px(5.0);
 const SCOREBOARD_SCORE_TEXT: &str = "Score: ";
 const SCOREBOARD_TIME_TEXT: &str = " | Time: ";
 const MAX_EFFECT_CAPACITY: u32 = 4096;
-const PAUSEBTN_SIZE: Vec2 = Vec2::splat(32.0);
-const PAUSEBTN_PADDING: f32 = 5.0;
 
 #[derive(Default, Component, Debug)]
 struct Cue {
@@ -59,9 +60,6 @@ struct DecideEffect;
 
 #[derive(Component)]
 struct ReversalEffect;
-
-#[derive(Component)]
-struct PauseButton;
 
 #[derive(Resource)]
 struct GameTimer(Timer);
@@ -146,21 +144,8 @@ fn setup(
     ))
     .insert(Name::new("scoreboard"));
     // Pause button
-    let pause_pos = Vec3::new(
-        WINDOW_SIZE.x - PAUSEBTN_SIZE.x / 2.0 - PAUSEBTN_PADDING, 
-        0.0 + PAUSEBTN_SIZE.y / 2.0 + PAUSEBTN_PADDING, 
-        10.0
-    );
     commands.spawn((
-        SpriteBundle {
-            sprite: Sprite {
-                custom_size: Some(PAUSEBTN_SIZE),
-                ..default()
-            },
-            texture: asset_server.load(PATH_PAUSE_IMAGE),
-            transform: Transform::from_translation(pause_pos),
-            ..default()
-        },
+        get_pausebtn(asset_server, PATH_PAUSE_IMAGE.to_string()),
         PauseButton,
     ))
     .insert(Name::new("pausebtn"));
@@ -369,29 +354,6 @@ fn update_gametimer(
     }
 }
 
-fn pausebtn_click(
-    mut commands: Commands,
-    window_query: Query<&Window, With<PrimaryWindow>>,
-    mouse_event: Res<ButtonInput<MouseButton>>,
-    pausebtn_query: Query<(&Transform, Entity), With<PauseButton>>,
-    mut app_state: ResMut<NextState<AppState>>,
-) {
-    if !mouse_event.just_pressed(MouseButton::Left) { return; }
-
-    let window = window_query.single();
-    let mut cursor_pos = window.cursor_position().unwrap();
-    let (pausebtn_transform, pausebtn) = pausebtn_query.single();
-    let pausebtn_pos = pausebtn_transform.translation.truncate();
-    cursor_pos = Vec2::new(cursor_pos.x, -cursor_pos.y + WINDOW_SIZE.y);
-
-    let distance = cursor_pos.distance(pausebtn_pos);
-
-    if distance < PAUSEBTN_SIZE.x - 10.0 {
-        app_state.set(AppState::Pause);
-        commands.entity(pausebtn).despawn();
-    }
-}
-
 pub struct IngamePlugin;
 
 impl Plugin for IngamePlugin {
@@ -411,7 +373,7 @@ impl Plugin for IngamePlugin {
                 spawn_decide_effect,
                 update_scoreboard,
                 update_gametimer,
-                pausebtn_click,
+                update_pausebtn,
             ).run_if(in_state(AppState::Ingame)));
     }
 }
