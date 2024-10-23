@@ -93,7 +93,9 @@ fn setup(
     camera_transform.translation.y = WINDOW_SIZE.y / 2.0;
     // Sounds
     let cue_timing_sound = asset_server.load(PATH_SOUND_TIMING);
+    let cue_reversal_sound = asset_server.load(PATH_SOUND_REVERSAL);
     commands.insert_resource(TimingSound(cue_timing_sound));
+    commands.insert_resource(ReversalSound(cue_reversal_sound));
     // Bar
     let bar_y = WINDOW_SIZE.y - (GRID_SIZE * 4) as f32 - BAR_SIZE.y / 2.0;
 
@@ -320,6 +322,20 @@ fn spawn_timing_effect(
     spawner.reset();
 }
 
+fn play_reversal_sound(
+    mut commands: Commands,
+    mut reversal_events: EventReader<ReversalEvent>,
+    sound: Res<ReversalSound>,
+) {
+    if reversal_events.is_empty() { return }
+    reversal_events.clear();
+
+    commands.spawn(AudioBundle {
+        source: sound.clone(),
+        settings: PlaybackSettings::DESPAWN,
+    });
+}
+
 fn spawn_reversal_effect(
     mut reversal_events: EventReader<ReversalEvent>,
     mut effect: Query<(&mut EffectSpawner, &mut Transform), With<ReversalEffect>>,
@@ -393,6 +409,7 @@ impl Plugin for IngamePlugin {
                 cue_movement,
                 decide_timing,
                 play_timing_sound,
+                play_reversal_sound,
                 spawn_timing_effect,
                 spawn_reversal_effect,
                 update_scoreboard,
