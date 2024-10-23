@@ -18,13 +18,6 @@ struct Cue {
 #[derive(Default, Component)]
 struct Bar;
 
-#[derive(Default, Bundle, LdtkEntity)]
-struct CueBundle {
-    cue: Cue,
-    #[sprite_sheet_bundle]
-    sprite_sheet_bundle: LdtkSpriteSheetBundle,
-}
-
 #[derive(Event, Default)]
 struct TimingEvent;
 
@@ -34,8 +27,8 @@ struct ReversalEvent;
 #[derive(Resource, Deref)]
 struct TimingSound(Handle<AudioSource>);
 
-#[derive(Component)]
-struct ScoreboardUi;
+#[derive(Resource, Deref)]
+struct ReversalSound(Handle<AudioSource>);
 
 #[derive(Component)]
 struct TimingEffect;
@@ -43,11 +36,18 @@ struct TimingEffect;
 #[derive(Component)]
 struct ReversalEffect;
 
-#[derive(Resource, Deref)]
-struct ReversalSound(Handle<AudioSource>);
+#[derive(Component)]
+struct ScoreboardUi;
 
 #[derive(Resource)]
 struct GameTimer(Timer);
+
+#[derive(Default, Bundle, LdtkEntity)]
+struct CueBundle {
+    cue: Cue,
+    #[sprite_sheet_bundle]
+    sprite_sheet_bundle: LdtkSpriteSheetBundle,
+}
 
 pub struct IngamePlugin;
 

@@ -78,11 +78,11 @@ fn mainmenu_update(
     mut app_state: ResMut<NextState<AppState>>,
 ) {
     if mouse_event.just_pressed(MouseButton::Left) {
-        // Despawned mainmenu
+        // despawned mainmenu
         for mainmenu_entity in mainmenu_query.iter() {
             commands.entity(mainmenu_entity).despawn();
         }
-        // Changed app state
+        // changed app state
         app_state.set(AppState::Ingame);
     }
 }

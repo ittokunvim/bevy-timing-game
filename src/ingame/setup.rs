@@ -4,7 +4,7 @@ use bevy_hanabi::prelude::*;
 
 use crate::{
     WINDOW_SIZE,
-    PATH_PAUSE_IMAGE,
+    PATH_IMAGE_PAUSE,
     PATH_FONT_BOLD,
     PATH_FONT_MEDIUM,
     PATH_LDTK_PROJECT,
@@ -107,18 +107,18 @@ pub fn component(
                 ..default()
             }),
         ])
-            .with_style(Style {
-                position_type: PositionType::Absolute,
-                top: SCOREBOARD_PADDING,
-                left: SCOREBOARD_PADDING,
-                ..default()
-            }),
+        .with_style(Style {
+            position_type: PositionType::Absolute,
+            top: SCOREBOARD_PADDING,
+            left: SCOREBOARD_PADDING,
+            ..default()
+        }),
         ScoreboardUi,
     ))
     .insert(Name::new("scoreboard"));
     // Pause button
     commands.spawn((
-        get_pausebtn(asset_server, PATH_PAUSE_IMAGE.to_string()),
+        get_pausebtn(asset_server, PATH_IMAGE_PAUSE.to_string()),
         PauseButton,
     ))
     .insert(Name::new("pausebtn"));
@@ -136,10 +136,6 @@ pub fn effect(
     gradient.add_key(0.0, Vec4::new(0.0, 0.7, 0.0, 1.0));
     gradient.add_key(1.0, Vec4::new(0.0, 0.7, 0.0, 0.0));
     let writer = ExprWriter::new();
-    let age = writer.lit(0.0).expr();
-    let init_age = SetAttributeModifier::new(Attribute::AGE, age);
-    let lifetime = writer.lit(1.0).expr();
-    let init_lifetime = SetAttributeModifier::new(Attribute::LIFETIME, lifetime);
     let init_pos = SetPositionCircleModifier {
         center: writer.lit(Vec3::ZERO).expr(),
         axis: writer.lit(Vec3::Z).expr(),
@@ -151,6 +147,10 @@ pub fn effect(
         axis: writer.lit(Vec3::Z).expr(),
         speed: writer.lit(10.0).expr(),
     };
+    let age = writer.lit(0.0).expr();
+    let init_age = SetAttributeModifier::new(Attribute::AGE, age);
+    let lifetime = writer.lit(1.0).expr();
+    let init_lifetime = SetAttributeModifier::new(Attribute::LIFETIME, lifetime);
     let effect = EffectAsset::new(vec![MAX_EFFECT_CAPACITY], Spawner::once(1000.0.into(), true), writer.finish())
         .with_name("timing_effect")
         .init(init_pos)
@@ -178,10 +178,6 @@ pub fn effect(
     gradient.add_key(0.8, Vec4::new(0.7, 0.0, 0.0, 0.5));
     gradient.add_key(1.0, Vec4::new(0.7, 0.0, 0.0, 0.0));
     let writer = ExprWriter::new();
-    let age = writer.lit(0.0).expr();
-    let init_age = SetAttributeModifier::new(Attribute::AGE, age);
-    let lifetime = writer.lit(1.0).expr();
-    let init_lifetime = SetAttributeModifier::new(Attribute::LIFETIME, lifetime);
     let init_pos = SetPositionCone3dModifier {
         base_radius: writer.lit(2.0).expr(),
         top_radius: writer.lit(10.0).expr(),
@@ -192,6 +188,10 @@ pub fn effect(
         center: writer.lit(Vec3::ZERO).expr(),
         speed: writer.lit(20.0).expr(),
     };
+    let age = writer.lit(0.0).expr();
+    let init_age = SetAttributeModifier::new(Attribute::AGE, age);
+    let lifetime = writer.lit(1.0).expr();
+    let init_lifetime = SetAttributeModifier::new(Attribute::LIFETIME, lifetime);
     let size = (writer.rand(ScalarType::Float) * writer.lit(1.5) + writer.lit(1.5)).expr();
     let init_size = SetAttributeModifier::new(Attribute::SIZE, size);
     let effect = EffectAsset::new(vec![MAX_EFFECT_CAPACITY], Spawner::once(50.0.into(), false), writer.finish())

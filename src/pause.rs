@@ -5,8 +5,8 @@ use bevy::{
 
 use crate::{
     WINDOW_SIZE,
-    PATH_PAUSE_IMAGE,
-    PATH_PLAY_IMAGE,
+    PATH_IMAGE_PAUSE,
+    PATH_IMAGE_PLAY,
     AppState,
 };
 
@@ -17,13 +17,13 @@ const PAUSEBTN_PADDING: f32 = 5.0;
 pub struct PauseButton;
 
 pub fn update_pausebtn(
-    window_query: Query<&Window, With<PrimaryWindow>>,
     mouse_event: Res<ButtonInput<MouseButton>>,
+    window_query: Query<&Window, With<PrimaryWindow>>,
     pausebtn_query: Query<(&Transform, Entity), With<PauseButton>>,
     mut commands: Commands,
+    asset_server: Res<AssetServer>,
     state: Res<State<AppState>>,
     mut app_state: ResMut<NextState<AppState>>,
-    asset_server: Res<AssetServer>,
 ) {
     if !mouse_event.just_pressed(MouseButton::Left) { return; }
 
@@ -40,7 +40,7 @@ pub fn update_pausebtn(
         match state.get() {
             AppState::Ingame => {
                 commands.spawn((
-                    get_pausebtn(asset_server, PATH_PLAY_IMAGE.to_string()),
+                    get_pausebtn(asset_server, PATH_IMAGE_PLAY.to_string()),
                     PauseButton,
                 ))
                 .insert(Name::new("pausebtn"));
@@ -48,7 +48,7 @@ pub fn update_pausebtn(
             },
             AppState::Pause => {
                 commands.spawn((
-                    get_pausebtn(asset_server, PATH_PAUSE_IMAGE.to_string()),
+                    get_pausebtn(asset_server, PATH_IMAGE_PAUSE.to_string()),
                     PauseButton,
                 ))
                 .insert(Name::new("pausebtn"));

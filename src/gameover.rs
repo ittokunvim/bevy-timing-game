@@ -2,6 +2,8 @@ use bevy::prelude::*;
 
 use crate::{
     WINDOW_SIZE,
+    PATH_FONT_BOLD,
+    PATH_FONT_MEDIUM,
     AppState,
     Score,
 };
@@ -15,8 +17,8 @@ const SCORE_TEXT: &str = "Score: ";
 const SCORE_FONT_SIZE: f32 = 24.0;
 const RESTART_TEXT: &str = "Click to Restart";
 const RESTART_FONT_SIZE: f32 = 24.0;
-const BG_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
-const BG_SIZE: Vec2 = Vec2::new(240.0, 240.0);
+const BACKGROUND_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
+const BACKGROUND_SIZE: Vec2 = Vec2::new(240.0, 240.0);
 
 #[derive(Component)]
 pub struct Gameover;
@@ -27,13 +29,13 @@ pub fn gameover_setup(
     score: Res<Score>,
 ) {
     // Gameover
-    let gameover_text = if **score <= 10 { GAMEOVER_TEXT } else { GAMECLEAR_TEXT };
+    let gameover_text = if **score > 10 { GAMECLEAR_TEXT } else { GAMEOVER_TEXT };
 
     commands.spawn((
         TextBundle::from_section(
             gameover_text,
             TextStyle {
-                font: asset_server.load("fonts/FiraSans-Bold.ttf"),
+                font: asset_server.load(PATH_FONT_BOLD),
                 font_size: GAMEOVER_FONT_SIZE,
                 color: FONT_COLOR,
             },
@@ -46,13 +48,13 @@ pub fn gameover_setup(
         }),
         Gameover,
     ))
-    .insert(Name::new("gameover"));
+    .insert(Name::new("gameover_text"));
     // Score
     commands.spawn((
         TextBundle::from_section(
             format!("{}{}", SCORE_TEXT, score.to_string()),
             TextStyle {
-                font: asset_server.load("fonts/FiraMono-Medium.ttf"),
+                font: asset_server.load(PATH_FONT_MEDIUM),
                 font_size: SCORE_FONT_SIZE,
                 color: FONT_COLOR,
             },
@@ -65,13 +67,13 @@ pub fn gameover_setup(
         }),
         Gameover,
     ))
-    .insert(Name::new("score"));
+    .insert(Name::new("gameover_score"));
     // Click to Restart
     commands.spawn((
         TextBundle::from_section(
             RESTART_TEXT,
             TextStyle {
-                font: asset_server.load("fonts/FiraMono-Medium.ttf"),
+                font: asset_server.load(PATH_FONT_MEDIUM),
                 font_size: RESTART_FONT_SIZE,
                 color: FONT_COLOR,
             },
@@ -84,13 +86,13 @@ pub fn gameover_setup(
         }),
         Gameover,
     ))
-    .insert(Name::new("click_restart"));
+    .insert(Name::new("gameover_restart"));
     // Gameover background
     commands.spawn((
         SpriteBundle {
             sprite: Sprite {
-                color: BG_COLOR,
-                custom_size: Some(BG_SIZE),
+                color: BACKGROUND_COLOR,
+                custom_size: Some(BACKGROUND_SIZE),
                 ..default()
             },
             transform: Transform {
@@ -105,7 +107,7 @@ pub fn gameover_setup(
         },
         Gameover,
     ))
-        .insert(Name::new("bg_gameover"));
+    .insert(Name::new("gameover_background"));
 }
 
 pub fn gameover_update(
@@ -115,15 +117,14 @@ pub fn gameover_update(
     mut score: ResMut<Score>,
     mut app_state: ResMut<NextState<AppState>>,
 ) {
-    // Mouse clicked
     if mouse_event.just_pressed(MouseButton::Left) {
-        // Despawned gameover entities
+        // despawned gameover
         for gameover_entity in gameover_query.iter() {
             commands.entity(gameover_entity).despawn();
         }
-        // Reset score
+        // reset score
         **score = 0;
-        // Moved app state to ingame
+        // change app state
         app_state.set(AppState::Ingame);
     }
 }
