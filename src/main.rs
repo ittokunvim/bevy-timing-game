@@ -16,7 +16,7 @@ pub const PATH_PLAY_IMAGE: &str = "images/play.png";
 pub const PATH_FONT_MEDIUM: &str = "fonts/FiraMono-Medium.ttf";
 pub const PATH_FONT_BOLD: &str = "fonts/FiraSans-Bold.ttf";
 pub const PATH_LDTK_PROJECT: &str = "ldtk/bevy-timing-game.ldtk";
-pub const PATH_SOUND_DECIDE: &str = "sounds/timing.ogg";
+pub const PATH_SOUND_TIMING: &str = "sounds/timing.ogg";
 
 const BG_COLOR: Color = Color::srgb(0.25, 0.25, 0.25);
 

@@ -8,7 +8,8 @@ use crate::{
     PATH_FONT_BOLD,
     PATH_FONT_MEDIUM,
     PATH_LDTK_PROJECT,
-    PATH_SOUND_DECIDE,
+    PATH_SOUND_TIMING,
+    PATH_SOUND_REVERSAL,
     AppState,
     Score,
 };
@@ -47,22 +48,25 @@ struct CueBundle {
 }
 
 #[derive(Event, Default)]
-struct DecideEvent;
+struct TimingEvent;
 
 #[derive(Event, Default)]
 struct ReversalEvent;
 
 #[derive(Resource, Deref)]
-struct DecideSound(Handle<AudioSource>);
+struct TimingSound(Handle<AudioSource>);
 
 #[derive(Component)]
 struct ScoreboardUi;
 
 #[derive(Component)]
-struct DecideEffect;
+struct TimingEffect;
 
 #[derive(Component)]
 struct ReversalEffect;
+
+#[derive(Resource, Deref)]
+struct ReversalSound(Handle<AudioSource>);
 
 #[derive(Resource)]
 struct GameTimer(Timer);
@@ -87,9 +91,9 @@ fn setup(
 
     camera_transform.translation.x = WINDOW_SIZE.x / 2.0;
     camera_transform.translation.y = WINDOW_SIZE.y / 2.0;
-    // Sound
-    let cue_decide_sound = asset_server.load(PATH_SOUND_DECIDE);
-    commands.insert_resource(DecideSound(cue_decide_sound));
+    // Sounds
+    let cue_timing_sound = asset_server.load(PATH_SOUND_TIMING);
+    commands.insert_resource(TimingSound(cue_timing_sound));
     // Bar
     let bar_y = WINDOW_SIZE.y - (GRID_SIZE * 4) as f32 - BAR_SIZE.y / 2.0;
 
@@ -161,7 +165,7 @@ fn effect_setup(
 ) {
     if !ldtk_project_entities.is_empty() { return }
 
-    // Decide effect
+    // Timing effect
     let mut gradient = Gradient::new();
     gradient.add_key(0.0, Vec4::new(0.0, 0.7, 0.0, 1.0));
     gradient.add_key(1.0, Vec4::new(0.0, 0.7, 0.0, 0.0));
@@ -182,7 +186,7 @@ fn effect_setup(
         speed: writer.lit(10.0).expr(),
     };
     let effect = EffectAsset::new(vec![MAX_EFFECT_CAPACITY], Spawner::once(1000.0.into(), true), writer.finish())
-        .with_name("decide_effect")
+        .with_name("timing_effect")
         .init(init_pos)
         .init(init_vel)
         .init(init_age)
@@ -199,9 +203,9 @@ fn effect_setup(
             effect: ParticleEffect::new(effect_handle).with_z_layer_2d(Some(10.0)),
             ..default()
         },
-        DecideEffect,
+        TimingEffect,
     ))
-    .insert(Name::new("decide_effect"));
+    .insert(Name::new("timing_effect"));
     // Reversal effect
     let mut gradient = Gradient::new();
     gradient.add_key(0.0, Vec4::new(0.7, 0.0, 0.0, 1.0));
@@ -267,11 +271,11 @@ fn decide_timing(
     mouse_event: Res<ButtonInput<MouseButton>>,
     cue_query: Query<&Transform, With<Cue>>,
     bar_query: Query<&Transform, (With<Bar>, Without<Cue>)>,
-    mut decide_events: EventWriter<DecideEvent>,
+    mut timing_events: EventWriter<TimingEvent>,
     mut score: ResMut<Score>,
 ) {
     if !mouse_event.just_pressed(MouseButton::Left) { return }
-    decide_events.send_default();
+    timing_events.send_default();
 
     let bar_x = bar_query.single().translation.x;
     let cue_x = cue_query.single().translation.x;
@@ -287,13 +291,13 @@ fn decide_timing(
     }
 }
 
-fn play_decide_sound(
+fn play_timing_sound(
     mut commands: Commands,
-    mut decide_events: EventReader<DecideEvent>,
-    sound: Res<DecideSound>,
+    mut timing_events: EventReader<TimingEvent>,
+    sound: Res<TimingSound>,
 ) {
-    if decide_events.is_empty() { return }
-    decide_events.clear();
+    if timing_events.is_empty() { return }
+    timing_events.clear();
 
     commands.spawn(AudioBundle {
         source: sound.clone(),
@@ -301,13 +305,13 @@ fn play_decide_sound(
     });
 }
 
-fn spawn_decide_effect(
-    mut effect: Query<(&mut EffectSpawner, &mut Transform), (With<DecideEffect>, Without<Cue>, Without<Bar>)>,
-    mut decide_events: EventReader<DecideEvent>,
+fn spawn_timing_effect(
+    mut effect: Query<(&mut EffectSpawner, &mut Transform), (With<TimingEffect>, Without<Cue>, Without<Bar>)>,
+    mut timing_events: EventReader<TimingEvent>,
     cue_query: Query<&Transform, With<Cue>>,
 ) {
-    if decide_events.is_empty() { return }
-    decide_events.clear();
+    if timing_events.is_empty() { return }
+    timing_events.clear();
 
     let Ok((mut spawner, mut effect_transform)) = effect.get_single_mut() else { return; };
     let cue_transform = cue_query.single();
@@ -377,7 +381,7 @@ pub struct IngamePlugin;
 impl Plugin for IngamePlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_event::<DecideEvent>()
+            .add_event::<TimingEvent>()
             .add_event::<ReversalEvent>()
             .insert_resource(GameTimer(Timer::from_seconds(GAMETIME_LIMIT, TimerMode::Once)))
             .register_ldtk_entity::<CueBundle>("Cue")
@@ -388,8 +392,9 @@ impl Plugin for IngamePlugin {
             .add_systems(Update, (
                 cue_movement,
                 decide_timing,
-                play_decide_sound,
-                spawn_decide_effect,
+                play_timing_sound,
+                spawn_timing_effect,
+                spawn_reversal_effect,
                 update_scoreboard,
                 update_gametimer,
                 update_pausebtn,
