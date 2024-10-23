@@ -49,6 +49,9 @@ struct CueBundle {
 #[derive(Event, Default)]
 struct DecideEvent;
 
+#[derive(Event, Default)]
+struct ReversalEvent;
+
 #[derive(Resource, Deref)]
 struct DecideSound(Handle<AudioSource>);
 
@@ -244,29 +247,20 @@ fn effect_setup(
 fn cue_movement(
     mut cue_query: Query<(&mut Transform, &mut Cue), With<Cue>>,
     bar_query: Query<&Transform, (With<Bar>, Without<Cue>)>,
-    mut effect: Query<(&mut EffectSpawner, &mut Transform), (With<ReversalEffect>, Without<Cue>, Without<Bar>)>,
+    mut reversal_events: EventWriter<ReversalEvent>,
 ) {
-    let Ok((mut cue_transform, mut cue)) = cue_query.get_single_mut() else { return; };
+    let Ok((mut cue_transform, mut cue_prop)) = cue_query.get_single_mut() else { return; };
     let cue_x = cue_transform.translation.x;
     let bar_transform = bar_query.single();
-    let (bar_x, bar_y) = (bar_transform.translation.x, bar_transform.translation.y);
+    let bar_x = bar_transform.translation.x;
 
     if cue_x > bar_x + BAR_SIZE.x / 2.0 || cue_x < bar_x - BAR_SIZE.x / 2.0 {
+        reversal_events.send_default();
         // reversal movement
-        cue.toggle_move = !cue.toggle_move;
-        // reversal effect
-        let Ok((mut spawner, mut effect_transform)) = effect.get_single_mut() else { return; };
-        let transform_x = match cue.toggle_move {
-            true => bar_x - BAR_SIZE.x / 2.0,
-            false => bar_x + BAR_SIZE.x / 2.0,
-        };
-        let rotation_z = if cue.toggle_move { 1.5 } else { -1.5 };
-        effect_transform.translation = Vec3::new(transform_x, bar_y, 0.0);
-        effect_transform.rotation = Quat::from_rotation_z(rotation_z);
-        spawner.reset();
+        cue_prop.toggle_move = !cue_prop.toggle_move;
     }
 
-    cue_transform.translation.x += if cue.toggle_move { CUE_SPEED } else { -CUE_SPEED };
+    cue_transform.translation.x += if cue_prop.toggle_move { CUE_SPEED } else { -CUE_SPEED };
 }
 
 fn decide_timing(
@@ -277,7 +271,6 @@ fn decide_timing(
     mut score: ResMut<Score>,
 ) {
     if !mouse_event.just_pressed(MouseButton::Left) { return }
-
     decide_events.send_default();
 
     let bar_x = bar_query.single().translation.x;
@@ -300,8 +293,8 @@ fn play_decide_sound(
     sound: Res<DecideSound>,
 ) {
     if decide_events.is_empty() { return }
-
     decide_events.clear();
+
     commands.spawn(AudioBundle {
         source: sound.clone(),
         settings: PlaybackSettings::DESPAWN,
@@ -314,12 +307,37 @@ fn spawn_decide_effect(
     cue_query: Query<&Transform, With<Cue>>,
 ) {
     if decide_events.is_empty() { return }
+    decide_events.clear();
 
     let Ok((mut spawner, mut effect_transform)) = effect.get_single_mut() else { return; };
     let cue_transform = cue_query.single();
 
-    decide_events.clear();
     effect_transform.translation = cue_transform.translation;
+    spawner.reset();
+}
+
+fn spawn_reversal_effect(
+    mut reversal_events: EventReader<ReversalEvent>,
+    mut effect: Query<(&mut EffectSpawner, &mut Transform), With<ReversalEffect>>,
+    cue_query: Query<&Cue, With<Cue>>,
+    bar_query: Query<&Transform, (With<Bar>, Without<ReversalEffect>)>,
+) {
+    if reversal_events.is_empty() { return }
+    reversal_events.clear();
+
+    let Ok((mut spawner, mut effect_transform)) = effect.get_single_mut() else { return; };
+    let cue_prop = cue_query.single();
+    let bar_transform = bar_query.single();
+    let bar_xy = bar_transform.translation.xy();
+
+    let effect_transform_x = match cue_prop.toggle_move {
+        true => bar_xy.x - BAR_SIZE.x / 2.0,
+        false => bar_xy.x + BAR_SIZE.x / 2.0,
+    };
+    let effect_rotation_z = if cue_prop.toggle_move { 1.5 } else { -1.5 };
+
+    effect_transform.translation = Vec3::new(effect_transform_x, bar_xy.y, 0.0);
+    effect_transform.rotation = Quat::from_rotation_z(effect_rotation_z);
     spawner.reset();
 }
 
@@ -360,6 +378,7 @@ impl Plugin for IngamePlugin {
     fn build(&self, app: &mut App) {
         app
             .add_event::<DecideEvent>()
+            .add_event::<ReversalEvent>()
             .insert_resource(GameTimer(Timer::from_seconds(GAMETIME_LIMIT, TimerMode::Once)))
             .register_ldtk_entity::<CueBundle>("Cue")
             .add_systems(OnEnter(AppState::Ingame), (
