@@ -6,6 +6,8 @@ use crate::AppState;
 mod setup;
 mod update;
 
+mod effects;
+
 const GRID_SIZE: i32 = 16;
 const GAMETIME_LIMIT: f32 = 10.0;
 const BAR_SIZE: Vec2 = Vec2::new((GRID_SIZE * 32) as f32, (GRID_SIZE * 2) as f32);
@@ -39,12 +41,6 @@ struct TimingSound(Handle<AudioSource>);
 struct ReversalSound(Handle<AudioSource>);
 
 #[derive(Component)]
-struct TimingEffect;
-
-#[derive(Component)]
-struct ReversalEffect;
-
-#[derive(Component)]
 struct ScoreboardUi;
 
 #[derive(Resource)]
@@ -69,18 +65,16 @@ impl Plugin for IngamePlugin {
             .add_event::<ReversalEvent>()
             .insert_resource(GameTimer(Timer::from_seconds(GAMETIME_LIMIT, TimerMode::Once)))
             .register_ldtk_entity::<CueBundle>("Cue")
+            .add_plugins(effects::EffectsPlugin)
             .add_systems(OnEnter(AppState::Ingame), (
                 setup::component,
-                setup::effect,
             ))
             .add_systems(Update, (
                 update::cue_movement,
-                update::spawn_reversal_effect,
                 update::play_reversal_sound,
                 update::decide_timing,
                 update::animation_timingbtn,
                 update::score_point,
-                update::spawn_timing_effect,
                 update::play_timing_sound,
                 update::scoreboard,
                 crate::pause::update_pausebtn,

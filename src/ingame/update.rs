@@ -2,7 +2,6 @@ use bevy::{
     prelude::*,
     window::PrimaryWindow,
 };
-use bevy_hanabi::prelude::*;
 
 use crate::{
     WINDOW_SIZE,
@@ -21,8 +20,6 @@ use crate::ingame::{
     ReversalEvent,
     TimingSound,
     ReversalSound,
-    TimingEffect,
-    ReversalEffect,
     ScoreboardUi,
     AnimationTimer,
     GameTimer,
@@ -48,31 +45,6 @@ pub fn cue_movement(
     }
     // move cue
     cue_transform.translation.x += if cue_prop.toggle_move { CUE_SPEED } else { -CUE_SPEED };
-}
-
-pub fn spawn_reversal_effect(
-    mut reversal_events: EventReader<ReversalEvent>,
-    mut effect: Query<(&mut EffectSpawner, &mut Transform), (With<ReversalEffect>, Without<Bar>)>,
-    bar_query: Query<&Transform, (With<Bar>, Without<ReversalEffect>)>,
-    cue_query: Query<&Cue, With<Cue>>,
-) {
-    if reversal_events.is_empty() { return }
-    reversal_events.clear();
-
-    let Ok((mut effect_spawner, mut effect_transform)) = effect.get_single_mut() else { return; };
-    let bar_transform = bar_query.single();
-    let bar_xy = bar_transform.translation.xy();
-    let cue_prop = cue_query.single();
-
-    let effect_transform_x = match cue_prop.toggle_move {
-        true => bar_xy.x - BAR_SIZE.x / 2.0,
-        false => bar_xy.x + BAR_SIZE.x / 2.0,
-    };
-    let effect_rotation_z = if cue_prop.toggle_move { 1.5 } else { -1.5 };
-    // spawn reversal effect
-    effect_transform.translation = Vec3::new(effect_transform_x, bar_xy.y, 0.0);
-    effect_transform.rotation = Quat::from_rotation_z(effect_rotation_z);
-    effect_spawner.reset();
 }
 
 pub fn play_reversal_sound(
@@ -150,21 +122,6 @@ pub fn score_point(
     else {
         if **score > 0 { **score -= 1 };
     }
-}
-
-pub fn spawn_timing_effect(
-    mut timing_events: EventReader<TimingEvent>,
-    mut effect: Query<(&mut EffectSpawner, &mut Transform), (With<TimingEffect>, Without<Cue>)>,
-    cue_query: Query<&Transform, With<Cue>>,
-) {
-    if timing_events.is_empty() { return }
-    timing_events.clear();
-
-    let Ok((mut spawner, mut effect_transform)) = effect.get_single_mut() else { return; };
-    let cue_transform = cue_query.single();
-    // spawn timing effect
-    effect_transform.translation = cue_transform.translation;
-    spawner.reset();
 }
 
 pub fn play_timing_sound(
