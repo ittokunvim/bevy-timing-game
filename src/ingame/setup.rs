@@ -8,8 +8,6 @@ use crate::{
     PATH_IMAGE_PAUSE,
     PATH_IMAGE_TIMINGBUTTON,
     PATH_LDTK_PROJECT,
-    PATH_SOUND_TIMING,
-    PATH_SOUND_REVERSAL,
 };
 
 use crate::pause::{
@@ -25,8 +23,6 @@ use crate::ingame::{
     TimingButton,
     AnimationTimer,
     ScoreboardUi,
-    TimingSound,
-    ReversalSound,
 };
 
 const BAR_COLOR: Color = Color::srgb(0.25, 0.25, 0.25);
@@ -56,11 +52,6 @@ pub fn component(
 
     camera_transform.translation.x = WINDOW_SIZE.x / 2.0;
     camera_transform.translation.y = WINDOW_SIZE.y / 2.0;
-    // Sounds
-    let cue_timing_sound = asset_server.load(PATH_SOUND_TIMING);
-    let cue_reversal_sound = asset_server.load(PATH_SOUND_REVERSAL);
-    commands.insert_resource(TimingSound(cue_timing_sound));
-    commands.insert_resource(ReversalSound(cue_reversal_sound));
     // Bar
     let bar_y = WINDOW_SIZE.y - (GRID_SIZE * 4) as f32 - BAR_SIZE.y / 2.0;
 

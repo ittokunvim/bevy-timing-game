@@ -18,8 +18,6 @@ use crate::ingame::{
     TimingButton,
     TimingEvent,
     ReversalEvent,
-    TimingSound,
-    ReversalSound,
     ScoreboardUi,
     AnimationTimer,
     GameTimer,
@@ -45,20 +43,6 @@ pub fn cue_movement(
     }
     // move cue
     cue_transform.translation.x += if cue_prop.toggle_move { CUE_SPEED } else { -CUE_SPEED };
-}
-
-pub fn play_reversal_sound(
-    mut reversal_events: EventReader<ReversalEvent>,
-    mut commands: Commands,
-    sound: Res<ReversalSound>,
-) {
-    if reversal_events.is_empty() { return }
-    reversal_events.clear();
-    // play reversal sound
-    commands.spawn(AudioBundle {
-        source: sound.clone(),
-        settings: PlaybackSettings::DESPAWN,
-    });
 }
 
 pub fn decide_timing(
@@ -122,20 +106,6 @@ pub fn score_point(
     else {
         if **score > 0 { **score -= 1 };
     }
-}
-
-pub fn play_timing_sound(
-    mut timing_events: EventReader<TimingEvent>,
-    mut commands: Commands,
-    sound: Res<TimingSound>,
-) {
-    if timing_events.is_empty() { return }
-    timing_events.clear();
-    // play timing sound
-    commands.spawn(AudioBundle {
-        source: sound.clone(),
-        settings: PlaybackSettings::DESPAWN,
-    });
 }
 
 pub fn scoreboard(
