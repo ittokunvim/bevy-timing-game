@@ -7,6 +7,7 @@ mod setup;
 mod update;
 
 mod effects;
+mod scoreboard;
 mod sounds;
 
 const GRID_SIZE: i32 = 16;
@@ -35,9 +36,6 @@ struct TimingEvent;
 #[derive(Event, Default)]
 struct ReversalEvent;
 
-#[derive(Component)]
-struct ScoreboardUi;
-
 #[derive(Resource)]
 struct GameTimer(Timer);
 
@@ -61,6 +59,7 @@ impl Plugin for IngamePlugin {
             .insert_resource(GameTimer(Timer::from_seconds(GAMETIME_LIMIT, TimerMode::Once)))
             .register_ldtk_entity::<CueBundle>("Cue")
             .add_plugins(effects::EffectsPlugin)
+            .add_plugins(scoreboard::ScoreboardPlugin)
             .add_plugins(sounds::SoundsPlugin)
             .add_systems(OnEnter(AppState::Ingame), (
                 setup::component,
@@ -69,8 +68,6 @@ impl Plugin for IngamePlugin {
                 update::cue_movement,
                 update::decide_timing,
                 update::animation_timingbtn,
-                update::score_point,
-                update::scoreboard,
                 crate::pause::update_pausebtn,
                 update::gametimer,
             ).run_if(in_state(AppState::Ingame)));

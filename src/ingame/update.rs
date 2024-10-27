@@ -6,11 +6,9 @@ use bevy::{
 use crate::{
     WINDOW_SIZE,
     AppState,
-    Score,
 };
 
 use crate::ingame::{
-    GRID_SIZE,
     BAR_SIZE,
     TIMINGBTN_SIZE,
     Cue,
@@ -18,7 +16,6 @@ use crate::ingame::{
     TimingButton,
     TimingEvent,
     ReversalEvent,
-    ScoreboardUi,
     AnimationTimer,
     GameTimer,
 };
@@ -81,42 +78,6 @@ pub fn animation_timingbtn(
         prop.pushed = false;
         atlas.index = prop.first;
     }
-}
-
-pub fn score_point(
-    mut timing_events: EventReader<TimingEvent>,
-    cue_query: Query<&Transform, (With<Cue>, Without<Bar>)>,
-    bar_query: Query<&Transform, (With<Bar>, Without<Cue>)>,
-    mut score: ResMut<Score>,
-) {
-    if timing_events.is_empty() { return }
-    timing_events.clear();
-
-    let cue_x = cue_query.single().translation.x;
-    let bar_x = bar_query.single().translation.x;
-
-    // if cue was just timing
-    if cue_x < bar_x + GRID_SIZE as f32 && cue_x > bar_x - GRID_SIZE as f32 {
-        **score += 3;
-    }
-    // if cue was good timing
-    else if cue_x < bar_x + (GRID_SIZE * 2) as f32 && cue_x > bar_x - (GRID_SIZE * 2) as f32 {
-        **score += 2;
-    }
-    else {
-        if **score > 0 { **score -= 1 };
-    }
-}
-
-pub fn scoreboard(
-    mut scoreboard_query: Query<&mut Text, With<ScoreboardUi>>,
-    score: Res<Score>,
-    timer: ResMut<GameTimer>,
-) {
-    let mut text = scoreboard_query.single_mut();
-    // write score and timer
-    text.sections[1].value = score.to_string();
-    text.sections[3].value = timer.0.remaining_secs().round().to_string();
 }
 
 pub fn gametimer(

@@ -3,8 +3,6 @@ use bevy_ecs_ldtk::prelude::*;
 
 use crate::{
     WINDOW_SIZE,
-    PATH_FONT_MEDIUM,
-    PATH_FONT_BOLD,
     PATH_IMAGE_PAUSE,
     PATH_IMAGE_TIMINGBUTTON,
     PATH_LDTK_PROJECT,
@@ -22,15 +20,9 @@ use crate::ingame::{
     Bar,
     TimingButton,
     AnimationTimer,
-    ScoreboardUi,
 };
 
 const BAR_COLOR: Color = Color::srgb(0.25, 0.25, 0.25);
-const SCOREBOARD_FONT_SIZE: f32 = 24.0;
-const SCOREBOARD_COLOR: Color = Color::srgb(0.1, 0.1, 0.1);
-const SCOREBOARD_PADDING: Val = Val::Px(5.0);
-const SCOREBOARD_SCORE_TEXT: &str = "Score: ";
-const SCOREBOARD_TIME_TEXT: &str = " | Time: ";
 
 pub fn component(
     mut commands: Commands,
@@ -92,46 +84,6 @@ pub fn component(
         AnimationTimer(Timer::from_seconds(0.5, TimerMode::Repeating))
     ))
     .insert(Name::new("timingbtn"));
-    // Scoreboard
-    commands.spawn((
-        TextBundle::from_sections([
-            TextSection::new(
-                SCOREBOARD_SCORE_TEXT,
-                TextStyle {
-                    font: asset_server.load(PATH_FONT_BOLD),
-                    font_size: SCOREBOARD_FONT_SIZE,
-                    color: SCOREBOARD_COLOR,
-                },
-            ),
-            TextSection::from_style(TextStyle {
-                font: asset_server.load(PATH_FONT_MEDIUM),
-                font_size: SCOREBOARD_FONT_SIZE,
-                color: SCOREBOARD_COLOR,
-            }),
-            TextSection::new(
-                SCOREBOARD_TIME_TEXT,
-                TextStyle {
-                    font: asset_server.load(PATH_FONT_BOLD),
-                    font_size: SCOREBOARD_FONT_SIZE,
-                    color: SCOREBOARD_COLOR,
-                },
-            ),
-            TextSection::from_style(TextStyle {
-                font: asset_server.load(PATH_FONT_MEDIUM),
-                font_size: SCOREBOARD_FONT_SIZE,
-                color: SCOREBOARD_COLOR,
-                ..default()
-            }),
-        ])
-        .with_style(Style {
-            position_type: PositionType::Absolute,
-            top: SCOREBOARD_PADDING,
-            left: SCOREBOARD_PADDING,
-            ..default()
-        }),
-        ScoreboardUi,
-    ))
-    .insert(Name::new("scoreboard"));
     // Pause button
     commands.spawn((
         get_pausebtn(asset_server, PATH_IMAGE_PAUSE.to_string()),
