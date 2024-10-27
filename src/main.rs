@@ -10,17 +10,18 @@ mod gameover;
 
 pub const GAMETITLE: &str = "Timing Game";
 pub const WINDOW_SIZE: Vec2 = Vec2::new(640.0, 480.0);
-pub const PATH_BG_IMAGE: &str = "images/mainmenu.png";
-pub const PATH_IMAGE_TIMINGBTN: &str = "images/timingbutton.png";
-pub const PATH_IMAGE_PAUSE: &str = "images/pause.png";
-pub const PATH_IMAGE_PLAY: &str = "images/play.png";
+pub const CURSOR_RANGE: f32 = 10.0;
 pub const PATH_FONT_MEDIUM: &str = "fonts/FiraMono-Medium.ttf";
 pub const PATH_FONT_BOLD: &str = "fonts/FiraSans-Bold.ttf";
+pub const PATH_IMAGE_MAINMENU: &str = "images/mainmenu.png";
+pub const PATH_IMAGE_PAUSE: &str = "images/pause.png";
+pub const PATH_IMAGE_PLAY: &str = "images/play.png";
+pub const PATH_IMAGE_TIMINGBUTTON: &str = "images/timingbutton.png";
 pub const PATH_LDTK_PROJECT: &str = "ldtk/bevy-timing-game.ldtk";
 pub const PATH_SOUND_REVERSAL: &str = "sounds/reversal.ogg";
 pub const PATH_SOUND_TIMING: &str = "sounds/timing.ogg";
 
-const BG_COLOR: Color = Color::srgb(0.25, 0.25, 0.25);
+const BACKGROUND_COLOR: Color = Color::srgb(0.25, 0.25, 0.25);
 
 #[derive(States, Default, Debug, Clone, PartialEq, Eq, Hash)]
 pub enum AppState {
@@ -48,7 +49,7 @@ fn main() {
             .set(ImagePlugin::default_nearest())
         )
         .init_state::<AppState>()
-        .insert_resource(ClearColor(BG_COLOR))
+        .insert_resource(ClearColor(BACKGROUND_COLOR))
         .insert_resource(Time::<Fixed>::from_seconds(1.0 / 60.0))
         .insert_resource(Score(0))
         // Ldtk setup

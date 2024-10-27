@@ -3,9 +3,9 @@ use bevy::prelude::*;
 use crate::{
     GAMETITLE,
     WINDOW_SIZE,
-    PATH_BG_IMAGE,
     PATH_FONT_MEDIUM,
     PATH_FONT_BOLD,
+    PATH_IMAGE_MAINMENU,
     AppState,
 };
 
@@ -18,11 +18,11 @@ const CLICKSTART_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
 #[derive(Component)]
 struct Mainmenu;
 
-fn mainmenu_setup(
+fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
 ) {
-    // Game Title
+    // Game title
     commands.spawn((
         TextBundle::from_section(
             GAMETITLE,
@@ -41,7 +41,7 @@ fn mainmenu_setup(
         Mainmenu,
     ))
     .insert(Name::new("game_title"));
-    // Click Start
+    // Click start
     commands.spawn((
         TextBundle::from_section(
             CLICKSTART_TEXT,
@@ -63,7 +63,7 @@ fn mainmenu_setup(
     // Background image
     commands.spawn((
         SpriteBundle {
-            texture: asset_server.load(PATH_BG_IMAGE),
+            texture: asset_server.load(PATH_IMAGE_MAINMENU),
             ..default()
         },
         Mainmenu,
@@ -71,18 +71,18 @@ fn mainmenu_setup(
     .insert(Name::new("bg_image"));
 }
 
-fn mainmenu_update(
+fn update(
     mouse_event: Res<ButtonInput<MouseButton>>,
     mainmenu_query: Query<Entity, With<Mainmenu>>,
     mut commands: Commands,
     mut app_state: ResMut<NextState<AppState>>,
 ) {
     if mouse_event.just_pressed(MouseButton::Left) {
-        // despawned mainmenu
+        // despawn mainmenu entities
         for mainmenu_entity in mainmenu_query.iter() {
             commands.entity(mainmenu_entity).despawn();
         }
-        // changed app state
+        // change app state
         app_state.set(AppState::Ingame);
     }
 }
@@ -92,7 +92,7 @@ pub struct MainmenuPlugin;
 impl Plugin for MainmenuPlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_systems(OnEnter(AppState::Mainmenu), mainmenu_setup)
-            .add_systems(Update, mainmenu_update.run_if(in_state(AppState::Mainmenu)));
+            .add_systems(OnEnter(AppState::Mainmenu), setup)
+            .add_systems(Update, update.run_if(in_state(AppState::Mainmenu)));
     }
 }

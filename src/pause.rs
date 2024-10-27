@@ -5,6 +5,7 @@ use bevy::{
 
 use crate::{
     WINDOW_SIZE,
+    CURSOR_RANGE,
     PATH_IMAGE_PAUSE,
     PATH_IMAGE_PLAY,
     AppState,
@@ -31,11 +32,12 @@ pub fn update_pausebtn(
     let mut cursor_pos = window.cursor_position().unwrap();
     let (pausebtn_transform, pausebtn) = pausebtn_query.single();
     let pausebtn_pos = pausebtn_transform.translation.truncate();
+    // get cursor position
     cursor_pos = Vec2::new(cursor_pos.x, -cursor_pos.y + WINDOW_SIZE.y);
 
     let distance = cursor_pos.distance(pausebtn_pos);
 
-    if distance < PAUSEBTN_SIZE.x - 10.0 {
+    if distance < PAUSEBTN_SIZE.x - CURSOR_RANGE {
         commands.entity(pausebtn).despawn();
         match state.get() {
             AppState::Ingame => {

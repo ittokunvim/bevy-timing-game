@@ -2,16 +2,16 @@ use bevy::prelude::*;
 
 use crate::{
     WINDOW_SIZE,
-    PATH_FONT_BOLD,
     PATH_FONT_MEDIUM,
+    PATH_FONT_BOLD,
     AppState,
     Score,
 };
 
 const FONT_COLOR: Color = Color::srgb(0.1, 0.1, 0.1);
 const TEXT_GAP: f32 = 64.0;
-const GAMEOVER_TEXT: &str = "Game Over...";
 const GAMECLEAR_TEXT: &str = "Game Clear!!";
+const GAMEOVER_TEXT: &str = "Game Over...";
 const GAMEOVER_FONT_SIZE: f32 = 32.0;
 const SCORE_TEXT: &str = "Score: ";
 const SCORE_FONT_SIZE: f32 = 24.0;
@@ -23,12 +23,12 @@ const BACKGROUND_SIZE: Vec2 = Vec2::new(240.0, 240.0);
 #[derive(Component)]
 pub struct Gameover;
 
-pub fn gameover_setup(
+pub fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     score: Res<Score>,
 ) {
-    // Gameover
+    // Gameover text
     let gameover_text = if **score >= 10 { GAMECLEAR_TEXT } else { GAMEOVER_TEXT };
 
     commands.spawn((
@@ -49,7 +49,7 @@ pub fn gameover_setup(
         Gameover,
     ))
     .insert(Name::new("gameover_text"));
-    // Score
+    // Score text
     commands.spawn((
         TextBundle::from_section(
             format!("{}{}", SCORE_TEXT, score.to_string()),
@@ -68,7 +68,7 @@ pub fn gameover_setup(
         Gameover,
     ))
     .insert(Name::new("gameover_score"));
-    // Click to Restart
+    // Click to restart
     commands.spawn((
         TextBundle::from_section(
             RESTART_TEXT,
@@ -110,7 +110,7 @@ pub fn gameover_setup(
     .insert(Name::new("gameover_background"));
 }
 
-pub fn gameover_update(
+pub fn update(
     mouse_event: Res<ButtonInput<MouseButton>>,
     gameover_query: Query<Entity, With<Gameover>>,
     mut commands: Commands,
@@ -118,7 +118,7 @@ pub fn gameover_update(
     mut app_state: ResMut<NextState<AppState>>,
 ) {
     if mouse_event.just_pressed(MouseButton::Left) {
-        // despawned gameover
+        // despawn gameover entites
         for gameover_entity in gameover_query.iter() {
             commands.entity(gameover_entity).despawn();
         }
@@ -134,7 +134,7 @@ pub struct GameoverPlugin;
 impl Plugin for GameoverPlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_systems(OnEnter(AppState::Gameover), gameover_setup)
-            .add_systems(Update, gameover_update.run_if(in_state(AppState::Gameover)));
+            .add_systems(OnEnter(AppState::Gameover), setup)
+            .add_systems(Update, update.run_if(in_state(AppState::Gameover)));
     }
 }
