@@ -11,6 +11,7 @@ mod gameover;
 pub const GAMETITLE: &str = "Timing Game";
 pub const WINDOW_SIZE: Vec2 = Vec2::new(640.0, 480.0);
 pub const PATH_BG_IMAGE: &str = "images/mainmenu.png";
+pub const PATH_IMAGE_TIMINGBTN: &str = "images/timingbutton.png";
 pub const PATH_IMAGE_PAUSE: &str = "images/pause.png";
 pub const PATH_IMAGE_PLAY: &str = "images/play.png";
 pub const PATH_FONT_MEDIUM: &str = "fonts/FiraMono-Medium.ttf";

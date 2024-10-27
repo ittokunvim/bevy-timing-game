@@ -29,7 +29,7 @@ pub fn gameover_setup(
     score: Res<Score>,
 ) {
     // Gameover
-    let gameover_text = if **score > 10 { GAMECLEAR_TEXT } else { GAMEOVER_TEXT };
+    let gameover_text = if **score >= 10 { GAMECLEAR_TEXT } else { GAMEOVER_TEXT };
 
     commands.spawn((
         TextBundle::from_section(
