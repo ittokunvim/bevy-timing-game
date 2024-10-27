@@ -4,6 +4,7 @@ use bevy_hanabi::prelude::*;
 
 use crate::{
     WINDOW_SIZE,
+    PATH_IMAGE_TIMINGBTN,
     PATH_IMAGE_PAUSE,
     PATH_FONT_BOLD,
     PATH_FONT_MEDIUM,
@@ -19,8 +20,11 @@ use crate::pause::{
 
 use crate::ingame::{
     GRID_SIZE,
+    TIMINGBTN_SIZE,
     BAR_SIZE,
     Bar,
+    TimingButton,
+    AnimationTimer,
     ScoreboardUi,
     TimingEffect,
     TimingSound,
@@ -41,6 +45,7 @@ pub fn component(
     asset_server: Res<AssetServer>,
     mut camera_query: Query<&mut Transform, With<Camera2d>>,
     ldtk_project_entities: Query<&Handle<LdtkProject>>,
+    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
     // Ldtk project
     if !ldtk_project_entities.is_empty() { return }
@@ -76,6 +81,30 @@ pub fn component(
         Bar,
     ))
     .insert(Name::new("bar"));
+    // Timing button
+    let layout = TextureAtlasLayout::from_grid(UVec2::splat(TIMINGBTN_SIZE), 2, 1, None, None);
+    let texture_atlas_layout = texture_atlas_layouts.add(layout);
+    let animation_indices = TimingButton { pushed: false, first: 0, last: 1 };
+    let timingbtn_pos = Vec3::new(
+        WINDOW_SIZE.x / 2.0,
+        WINDOW_SIZE.y / 2.0 - GRID_SIZE as f32 * 2.0,
+        5.0
+    );
+
+    commands.spawn((
+        SpriteBundle {
+            texture: asset_server.load(PATH_IMAGE_TIMINGBTN),
+            transform: Transform::from_translation(timingbtn_pos),
+            ..default()
+        },
+        TextureAtlas {
+            layout: texture_atlas_layout,
+            index: animation_indices.first,
+        },
+        animation_indices,
+        AnimationTimer(Timer::from_seconds(0.5, TimerMode::Repeating))
+    ))
+    .insert(Name::new("timingbtn"));
     // Scoreboard
     commands.spawn((
         TextBundle::from_sections([
