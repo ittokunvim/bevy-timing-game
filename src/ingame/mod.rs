@@ -7,6 +7,7 @@ mod setup;
 mod update;
 
 mod effects;
+mod pausebutton;
 mod scoreboard;
 mod sounds;
 
@@ -59,6 +60,7 @@ impl Plugin for IngamePlugin {
             .insert_resource(GameTimer(Timer::from_seconds(GAMETIME_LIMIT, TimerMode::Once)))
             .register_ldtk_entity::<CueBundle>("Cue")
             .add_plugins(effects::EffectsPlugin)
+            .add_plugins(pausebutton::PauseButtonPlugin)
             .add_plugins(scoreboard::ScoreboardPlugin)
             .add_plugins(sounds::SoundsPlugin)
             .add_systems(OnEnter(AppState::Ingame), (
@@ -68,7 +70,6 @@ impl Plugin for IngamePlugin {
                 update::cue_movement,
                 update::decide_timing,
                 update::animation_timingbtn,
-                crate::pause::update_pausebtn,
                 update::gametimer,
             ).run_if(in_state(AppState::Ingame)));
     }

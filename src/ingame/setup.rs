@@ -3,14 +3,8 @@ use bevy_ecs_ldtk::prelude::*;
 
 use crate::{
     WINDOW_SIZE,
-    PATH_IMAGE_PAUSE,
     PATH_IMAGE_TIMINGBUTTON,
     PATH_LDTK_PROJECT,
-};
-
-use crate::pause::{
-    PauseButton,
-    get_pausebtn,
 };
 
 use crate::ingame::{
@@ -84,10 +78,4 @@ pub fn component(
         AnimationTimer(Timer::from_seconds(0.5, TimerMode::Repeating))
     ))
     .insert(Name::new("timingbtn"));
-    // Pause button
-    commands.spawn((
-        get_pausebtn(asset_server, PATH_IMAGE_PAUSE.to_string()),
-        PauseButton,
-    ))
-    .insert(Name::new("pausebtn"));
 }
