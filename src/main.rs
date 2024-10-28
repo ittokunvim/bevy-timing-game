@@ -5,7 +5,6 @@ use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
 mod mainmenu;
 mod ingame;
-mod pause;
 mod gameover;
 
 pub const GAMETITLE: &str = "Timing Game";
@@ -63,7 +62,6 @@ fn main() {
         .add_systems(Startup, setup_camera)
         .add_plugins(mainmenu::MainmenuPlugin)
         .add_plugins(ingame::IngamePlugin)
-        .add_plugins(pause::PausePlugin)
         .add_plugins(gameover::GameoverPlugin)
         .run();
 }
