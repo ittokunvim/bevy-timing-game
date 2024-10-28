@@ -1,22 +1,11 @@
-use bevy::{
-    prelude::*,
-    window::PrimaryWindow,
-};
+use bevy::prelude::*;
 
-use crate::{
-    WINDOW_SIZE,
-    AppState,
-};
-
+use crate::AppState;
 use crate::ingame::{
     BAR_SIZE,
-    TIMINGBTN_SIZE,
     Cue,
     Bar,
-    TimingButton,
-    TimingEvent,
     ReversalEvent,
-    AnimationTimer,
     GameTimer,
 };
 
@@ -40,44 +29,6 @@ pub fn cue_movement(
     }
     // move cue
     cue_transform.translation.x += if cue_prop.toggle_move { CUE_SPEED } else { -CUE_SPEED };
-}
-
-pub fn decide_timing(
-    mouse_event: Res<ButtonInput<MouseButton>>,
-    window_query: Query<&Window, With<PrimaryWindow>>,
-    mut query: Query<(&Transform, &mut TimingButton, &mut TextureAtlas), With<TimingButton>>,
-    mut timing_events: EventWriter<TimingEvent>,
-) {
-    if !mouse_event.just_pressed(MouseButton::Left) { return }
-
-    let window = window_query.single();
-    let mut cursor_pos = window.cursor_position().unwrap();
-    let Ok((transform, mut prop, mut atlas)) = query.get_single_mut() else { return; };
-    let timingbtn_pos = transform.translation.truncate();
-    cursor_pos = Vec2::new(cursor_pos.x, -cursor_pos.y + WINDOW_SIZE.y);
-
-    let distance = cursor_pos.distance(timingbtn_pos);
-
-    if distance < TIMINGBTN_SIZE as f32 - 10.0 {
-        timing_events.send_default();
-        // animation timingbtn
-        prop.pushed = true;
-        atlas.index = prop.last;
-     }
-}
-
-pub fn animation_timingbtn(
-    time: Res<Time>,
-    mut query: Query<(&mut TimingButton, &mut AnimationTimer, &mut TextureAtlas), With<TimingButton>>,
-) {
-    let Ok((mut prop, mut timer, mut atlas)) = query.get_single_mut() else { return; };
-
-    if !prop.pushed { return; }
-    timer.tick(time.delta());
-    if timer.just_finished() {
-        prop.pushed = false;
-        atlas.index = prop.first;
-    }
 }
 
 pub fn gametimer(
