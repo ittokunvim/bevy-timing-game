@@ -25,6 +25,15 @@ struct Cue {
 struct Bar;
 
 #[derive(Event, Default)]
+struct GoodEvent;
+
+#[derive(Event, Default)]
+struct OkEvent;
+
+#[derive(Event, Default)]
+struct PerfectEvent;
+
+#[derive(Event, Default)]
 struct TimingEvent;
 
 #[derive(Event, Default)]

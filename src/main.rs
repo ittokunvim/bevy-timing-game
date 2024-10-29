@@ -16,6 +16,9 @@ pub const PATH_IMAGE_MAINMENU: &str = "images/mainmenu.png";
 pub const PATH_IMAGE_PAUSEBUTTON: &str = "images/pausebutton.png";
 pub const PATH_IMAGE_TIMINGBUTTON: &str = "images/timingbutton.png";
 pub const PATH_LDTK_PROJECT: &str = "ldtk/bevy-timing-game.ldtk";
+pub const PATH_SOUND_GOOD: &str = "sounds/good.ogg";
+pub const PATH_SOUND_OK: &str = "sounds/ok.ogg";
+pub const PATH_SOUND_PERFECT: &str = "sounds/perfect.ogg";
 pub const PATH_SOUND_REVERSAL: &str = "sounds/reversal.ogg";
 pub const PATH_SOUND_TIMING: &str = "sounds/timing.ogg";
 
