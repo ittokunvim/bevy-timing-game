@@ -1,13 +1,11 @@
 use bevy::prelude::*;
 
-use crate::AppState;
-
-mod setup;
-mod update;
-
 mod bar;
+mod camera;
 mod cue;
 mod effects;
+mod gametimer;
+mod ldtk;
 mod pausebutton;
 mod scoreboard;
 mod sounds;
@@ -49,17 +47,14 @@ impl Plugin for IngamePlugin {
             .add_event::<ReversalEvent>()
             .insert_resource(GameTimer(Timer::from_seconds(GAMETIME_LIMIT, TimerMode::Once)))
             .add_plugins(bar::BarPlugin)
+            .add_plugins(camera::CameraPlugin)
             .add_plugins(cue::CuePlugin)
             .add_plugins(effects::EffectsPlugin)
+            .add_plugins(gametimer::GameTimerPlugin)
+            .add_plugins(ldtk::LdtkPlugin)
             .add_plugins(pausebutton::PauseButtonPlugin)
             .add_plugins(scoreboard::ScoreboardPlugin)
             .add_plugins(sounds::SoundsPlugin)
-            .add_plugins(timingbutton::TimingButtonPlugin)
-            .add_systems(OnEnter(AppState::Ingame), (
-                setup::component,
-            ))
-            .add_systems(Update, (
-                update::gametimer,
-            ).run_if(in_state(AppState::Ingame)));
+            .add_plugins(timingbutton::TimingButtonPlugin);
     }
 }
