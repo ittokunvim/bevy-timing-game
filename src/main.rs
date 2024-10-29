@@ -12,6 +12,7 @@ pub const WINDOW_SIZE: Vec2 = Vec2::new(640.0, 480.0);
 pub const CURSOR_RANGE: f32 = 10.0;
 pub const PATH_FONT_MEDIUM: &str = "fonts/FiraMono-Medium.ttf";
 pub const PATH_FONT_BOLD: &str = "fonts/FiraSans-Bold.ttf";
+pub const PATH_IMAGE_CHARACTER_IDLE: &str = "images/character/idle.png";
 pub const PATH_IMAGE_MAINMENU: &str = "images/mainmenu.png";
 pub const PATH_IMAGE_PAUSEBUTTON: &str = "images/pausebutton.png";
 pub const PATH_IMAGE_TIMINGBUTTON: &str = "images/timingbutton.png";
