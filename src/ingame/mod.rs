@@ -2,6 +2,7 @@ use bevy::prelude::*;
 
 mod bar;
 mod camera;
+mod character;
 mod cue;
 mod effects;
 mod gametimer;
@@ -48,6 +49,7 @@ impl Plugin for IngamePlugin {
             .insert_resource(GameTimer(Timer::from_seconds(GAMETIME_LIMIT, TimerMode::Once)))
             .add_plugins(bar::BarPlugin)
             .add_plugins(camera::CameraPlugin)
+            .add_plugins(character::CharacterPlugin)
             .add_plugins(cue::CuePlugin)
             .add_plugins(effects::EffectsPlugin)
             .add_plugins(gametimer::GameTimerPlugin)
