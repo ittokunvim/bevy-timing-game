@@ -3,10 +3,6 @@ use bevy_ecs_ldtk::prelude::*;
 
 use crate::AppState;
 use crate::ingame::{
-    GRID_SIZE,
-    BAR_SIZE,
-    Cue,
-    Bar,
     PerfectEvent,
     GoodEvent,
     OkEvent,
@@ -15,6 +11,16 @@ use crate::ingame::{
     ReversalEvent,
     GameTimer,
 };
+use crate::ingame::bar::{
+    GRID_SIZE,
+    BAR_SIZE,
+    Bar,
+};
+
+#[derive(Default, Component, Debug)]
+pub struct Cue {
+    pub toggle_move: bool,
+}
 
 #[derive(Default, Bundle, LdtkEntity)]
 struct CueBundle {

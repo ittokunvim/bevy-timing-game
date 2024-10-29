@@ -9,10 +9,8 @@ use crate::{
     PATH_IMAGE_TIMINGBUTTON,
     AppState,
 };
-use crate::ingame::{
-    GRID_SIZE,
-    TimingEvent,
-};
+use crate::ingame::TimingEvent;
+use crate::ingame::bar::GRID_SIZE;
 
 const TIMINGBUTTON_SIZE: u32 = 64;
 

@@ -5,6 +5,7 @@ use crate::AppState;
 mod setup;
 mod update;
 
+mod bar;
 mod cue;
 mod effects;
 mod pausebutton;
@@ -12,17 +13,7 @@ mod scoreboard;
 mod sounds;
 mod timingbutton;
 
-const GRID_SIZE: i32 = 16;
 const GAMETIME_LIMIT: f32 = 10.0;
-const BAR_SIZE: Vec2 = Vec2::new((GRID_SIZE * 32) as f32, (GRID_SIZE * 2) as f32);
-
-#[derive(Default, Component, Debug)]
-struct Cue {
-    toggle_move: bool,
-}
-
-#[derive(Default, Component)]
-struct Bar;
 
 #[derive(Event, Default)]
 struct PerfectEvent;
@@ -57,6 +48,7 @@ impl Plugin for IngamePlugin {
             .add_event::<TimingEvent>()
             .add_event::<ReversalEvent>()
             .insert_resource(GameTimer(Timer::from_seconds(GAMETIME_LIMIT, TimerMode::Once)))
+            .add_plugins(bar::BarPlugin)
             .add_plugins(cue::CuePlugin)
             .add_plugins(effects::EffectsPlugin)
             .add_plugins(pausebutton::PauseButtonPlugin)

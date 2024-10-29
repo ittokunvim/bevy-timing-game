@@ -5,11 +5,13 @@ use bevy_hanabi::prelude::*;
 use crate::AppState;
 
 use crate::ingame::{
-    BAR_SIZE,
-    Cue,
-    Bar,
     TimingEvent,
     ReversalEvent,
+};
+use crate::ingame::cue::Cue;
+use crate::ingame::bar::{
+    BAR_SIZE,
+    Bar,
 };
 
 const MAX_EFFECT_CAPACITY: u32 = 4096;
