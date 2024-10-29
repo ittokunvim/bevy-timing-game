@@ -1,11 +1,11 @@
 use bevy::prelude::*;
-use bevy_ecs_ldtk::prelude::*;
 
 use crate::AppState;
 
 mod setup;
 mod update;
 
+mod cue;
 mod effects;
 mod pausebutton;
 mod scoreboard;
@@ -25,13 +25,16 @@ struct Cue {
 struct Bar;
 
 #[derive(Event, Default)]
+struct PerfectEvent;
+
+#[derive(Event, Default)]
 struct GoodEvent;
 
 #[derive(Event, Default)]
 struct OkEvent;
 
 #[derive(Event, Default)]
-struct PerfectEvent;
+struct BadEvent;
 
 #[derive(Event, Default)]
 struct TimingEvent;
@@ -42,22 +45,19 @@ struct ReversalEvent;
 #[derive(Resource)]
 struct GameTimer(Timer);
 
-#[derive(Default, Bundle, LdtkEntity)]
-struct CueBundle {
-    cue: Cue,
-    #[sprite_sheet_bundle]
-    sprite_sheet_bundle: LdtkSpriteSheetBundle,
-}
-
 pub struct IngamePlugin;
 
 impl Plugin for IngamePlugin {
     fn build(&self, app: &mut App) {
         app
+            .add_event::<PerfectEvent>()
+            .add_event::<GoodEvent>()
+            .add_event::<OkEvent>()
+            .add_event::<BadEvent>()
             .add_event::<TimingEvent>()
             .add_event::<ReversalEvent>()
             .insert_resource(GameTimer(Timer::from_seconds(GAMETIME_LIMIT, TimerMode::Once)))
-            .register_ldtk_entity::<CueBundle>("Cue")
+            .add_plugins(cue::CuePlugin)
             .add_plugins(effects::EffectsPlugin)
             .add_plugins(pausebutton::PauseButtonPlugin)
             .add_plugins(scoreboard::ScoreboardPlugin)
@@ -67,7 +67,6 @@ impl Plugin for IngamePlugin {
                 setup::component,
             ))
             .add_systems(Update, (
-                update::cue_movement,
                 update::gametimer,
             ).run_if(in_state(AppState::Ingame)));
     }

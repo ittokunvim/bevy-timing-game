@@ -47,9 +47,9 @@ fn setup(
     let timing_sound = asset_server.load(PATH_SOUND_TIMING);
     let reversal_sound = asset_server.load(PATH_SOUND_REVERSAL);
 
-    commands.insert_resource(TimingSound(good_sound));
-    commands.insert_resource(TimingSound(ok_sound));
-    commands.insert_resource(TimingSound(perfect_sound));
+    commands.insert_resource(GoodSound(good_sound));
+    commands.insert_resource(OkSound(ok_sound));
+    commands.insert_resource(PerfectSound(perfect_sound));
     commands.insert_resource(TimingSound(timing_sound));
     commands.insert_resource(ReversalSound(reversal_sound));
 }

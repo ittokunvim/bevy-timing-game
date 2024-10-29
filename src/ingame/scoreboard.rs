@@ -9,10 +9,10 @@ use crate::{
 };
 
 use crate::ingame::{
-    GRID_SIZE,
-    Cue,
-    Bar,
-    TimingEvent,
+    PerfectEvent,
+    GoodEvent,
+    OkEvent,
+    BadEvent,
     GameTimer,
 };
 
@@ -21,6 +21,10 @@ const SCOREBOARD_COLOR: Color = Color::srgb(0.1, 0.1, 0.1);
 const SCOREBOARD_PADDING: Val = Val::Px(5.0);
 const SCOREBOARD_SCORE_TEXT: &str = "Score: ";
 const SCOREBOARD_TIME_TEXT: &str = " | Time: ";
+const PERFECT_POINT: usize = 3;
+const GOOD_POINT: usize = 2;
+const OK_POINT: usize = 1;
+const BAD_POINT: usize = 3;
 
 #[derive(Component)]
 struct ScoreboardUi;
@@ -86,27 +90,27 @@ fn write_scoreboard(
 }
 
 fn score_points(
-    mut timing_events: EventReader<TimingEvent>,
-    cue_query: Query<&Transform, (With<Cue>, Without<Bar>)>,
-    bar_query: Query<&Transform, (With<Bar>, Without<Cue>)>,
     mut score: ResMut<Score>,
+    mut perfect_events: EventReader<PerfectEvent>,
+    mut good_events: EventReader<GoodEvent>,
+    mut ok_events: EventReader<OkEvent>,
+    mut bad_events: EventReader<BadEvent>,
 ) {
-    if timing_events.is_empty() { return }
-    timing_events.clear();
-
-    let cue_x = cue_query.single().translation.x;
-    let bar_x = bar_query.single().translation.x;
-
-    // if cue was just timing
-    if cue_x < bar_x + GRID_SIZE as f32 && cue_x > bar_x - GRID_SIZE as f32 {
-        **score += 3;
+    if !perfect_events.is_empty() {
+        perfect_events.clear();
+        **score += PERFECT_POINT;
     }
-    // if cue was good timing
-    else if cue_x < bar_x + (GRID_SIZE * 2) as f32 && cue_x > bar_x - (GRID_SIZE * 2) as f32 {
-        **score += 2;
+    if !good_events.is_empty() {
+        good_events.clear();
+        **score += GOOD_POINT;
     }
-    else {
-        if **score > 0 { **score -= 1 };
+    if !ok_events.is_empty() {
+        ok_events.clear();
+        **score += OK_POINT;
+    }
+    if !bad_events.is_empty() {
+        bad_events.clear();
+        if **score > BAD_POINT { **score -= BAD_POINT } else { **score = 0 };
     }
 }
 
