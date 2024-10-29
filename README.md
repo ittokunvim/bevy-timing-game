@@ -33,7 +33,13 @@ GPUパーティクルシステム [bevy_hanabi](https://github.com/djeedai/bevy_
 
 LDtkアセット [SunnyLand](https://ansimuz.itch.io/sunny-land-pixel-game-art)
 
+タイミングボタン画像 [いらすとや](https://www.irasutoya.com/)
+
+ポーズボタン画像 [ICOOON MONO](https://icooon-mono.com/)
+
 効果音 [効果音ラボ](https://soundeffect-lab.info)
+
+タイミングボイス音源 [ゆくも！](https://www.yukumo.net/)
 
 画像編集 [Pixlr](https://pixlr.com)
 
