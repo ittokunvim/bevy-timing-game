@@ -4,7 +4,7 @@ mod bar;
 mod camera;
 mod character;
 mod cue;
-mod effects;
+// mod effects;
 mod gametimer;
 mod ldtk;
 mod pausebutton;
@@ -51,7 +51,7 @@ impl Plugin for IngamePlugin {
             .add_plugins(camera::CameraPlugin)
             .add_plugins(character::CharacterPlugin)
             .add_plugins(cue::CuePlugin)
-            .add_plugins(effects::EffectsPlugin)
+            // .add_plugins(effects::EffectsPlugin)
             .add_plugins(gametimer::GameTimerPlugin)
             .add_plugins(ldtk::LdtkPlugin)
             .add_plugins(pausebutton::PauseButtonPlugin)
