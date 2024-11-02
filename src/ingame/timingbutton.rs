@@ -12,16 +12,16 @@ use crate::{
 use crate::ingame::TimingEvent;
 use crate::ingame::bar::GRID_SIZE;
 
-const TIMINGBUTTON_SIZE: u32 = 64;
+const SIZE: u32 = 64;
 
-#[derive(Default, Component)]
+#[derive(Default, Component, Debug)]
 struct TimingButton {
     pushed: bool,
     first: usize,
     last: usize,
 }
 
-#[derive(Component, Deref, DerefMut)]
+#[derive(Default, Component, Deref, DerefMut, Debug)]
 struct AnimationTimer(Timer);
 
 fn setup(
@@ -33,7 +33,7 @@ fn setup(
     // Ldtk project
     if !ldtk_project_entities.is_empty() { return }
 
-    let layout = TextureAtlasLayout::from_grid(UVec2::splat(TIMINGBUTTON_SIZE), 2, 1, None, None);
+    let layout = TextureAtlasLayout::from_grid(UVec2::splat(SIZE), 2, 1, None, None);
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
     let animation_indices = TimingButton { pushed: false, first: 0, last: 1 };
     let timingbtn_pos = Vec3::new(
@@ -74,7 +74,7 @@ fn update(
 
     let distance = cursor_pos.distance(timingbtn_pos);
 
-    if distance < TIMINGBUTTON_SIZE as f32 - 10.0 {
+    if distance < SIZE as f32 - 10.0 {
         timing_events.send_default();
         // animation timingbtn
         prop.pushed = true;

@@ -13,7 +13,7 @@ use crate::ingame::{
 };
 use crate::ingame::bar::{
     GRID_SIZE,
-    BAR_SIZE,
+    SIZE as BAR_SIZE,
     Bar,
 };
 

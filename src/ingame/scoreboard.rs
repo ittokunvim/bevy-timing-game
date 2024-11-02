@@ -16,11 +16,11 @@ use crate::ingame::{
     GameTimer,
 };
 
-const SCOREBOARD_FONT_SIZE: f32 = 24.0;
-const SCOREBOARD_COLOR: Color = Color::srgb(0.1, 0.1, 0.1);
-const SCOREBOARD_PADDING: Val = Val::Px(5.0);
-const SCOREBOARD_SCORE_TEXT: &str = "Score: ";
-const SCOREBOARD_TIME_TEXT: &str = " | Time: ";
+const FONT_SIZE: f32 = 24.0;
+const COLOR: Color = Color::srgb(0.1, 0.1, 0.1);
+const PADDING: Val = Val::Px(5.0);
+const SCORE_TEXT: &str = "Score: ";
+const TIME_TEXT: &str = " | Time: ";
 const PERFECT_POINT: usize = 3;
 const GOOD_POINT: usize = 2;
 const OK_POINT: usize = 1;
@@ -40,37 +40,37 @@ fn setup(
     commands.spawn((
         TextBundle::from_sections([
             TextSection::new(
-                SCOREBOARD_SCORE_TEXT,
+                SCORE_TEXT,
                 TextStyle {
                     font: asset_server.load(PATH_FONT_BOLD),
-                    font_size: SCOREBOARD_FONT_SIZE,
-                    color: SCOREBOARD_COLOR,
+                    font_size: FONT_SIZE,
+                    color: COLOR,
                 },
             ),
             TextSection::from_style(TextStyle {
                 font: asset_server.load(PATH_FONT_MEDIUM),
-                font_size: SCOREBOARD_FONT_SIZE,
-                color: SCOREBOARD_COLOR,
+                font_size: FONT_SIZE,
+                color: COLOR,
             }),
             TextSection::new(
-                SCOREBOARD_TIME_TEXT,
+                TIME_TEXT,
                 TextStyle {
                     font: asset_server.load(PATH_FONT_BOLD),
-                    font_size: SCOREBOARD_FONT_SIZE,
-                    color: SCOREBOARD_COLOR,
+                    font_size: FONT_SIZE,
+                    color: COLOR,
                 },
             ),
             TextSection::from_style(TextStyle {
                 font: asset_server.load(PATH_FONT_MEDIUM),
-                font_size: SCOREBOARD_FONT_SIZE,
-                color: SCOREBOARD_COLOR,
+                font_size: FONT_SIZE,
+                color: COLOR,
                 ..default()
             }),
         ])
         .with_style(Style {
             position_type: PositionType::Absolute,
-            top: SCOREBOARD_PADDING,
-            left: SCOREBOARD_PADDING,
+            top: PADDING,
+            left: PADDING,
             ..default()
         }),
         ScoreboardUi,
@@ -78,7 +78,7 @@ fn setup(
     .insert(Name::new("scoreboard"));
 } 
 
-fn write_scoreboard(
+fn update(
     mut scoreboard_query: Query<&mut Text, With<ScoreboardUi>>,
     score: Res<Score>,
     timer: ResMut<GameTimer>,
@@ -121,7 +121,7 @@ impl Plugin for ScoreboardPlugin {
         app
             .add_systems(OnEnter(AppState::Ingame), setup)
             .add_systems(Update, (
-                write_scoreboard,
+                update,
                 score_points,
             ).run_if(in_state(AppState::Ingame)));
     }

@@ -11,11 +11,11 @@ use crate::{
     AppState,
 };
 
-const PAUSEBUTTON_IMAGE_SIZE: u32 = 64;
-const PAUSEBUTTON_SIZE: f32 = 32.0;
-const PAUSEBUTTON_PADDING: f32 = 5.0;
+const IMAGE_SIZE: u32 = 64;
+const SIZE: f32 = 32.0;
+const PADDING: f32 = 5.0;
 
-#[derive(Component)]
+#[derive(Default, Component, Debug)]
 struct PauseButton {
     first: usize,
     last: usize,
@@ -30,19 +30,19 @@ fn setup(
     // Ldtk project
     if !ldtk_project_entities.is_empty() { return }
 
-    let layout = TextureAtlasLayout::from_grid(UVec2::splat(PAUSEBUTTON_IMAGE_SIZE), 2, 1, None, None);
+    let layout = TextureAtlasLayout::from_grid(UVec2::splat(IMAGE_SIZE), 2, 1, None, None);
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
     let animation_indices = PauseButton { first: 0, last: 1 };
     let pos = Vec3::new(
-        WINDOW_SIZE.x - PAUSEBUTTON_SIZE as f32 / 2.0 - PAUSEBUTTON_PADDING, 
-        0.0 + PAUSEBUTTON_SIZE as f32 / 2.0 + PAUSEBUTTON_PADDING, 
+        WINDOW_SIZE.x - SIZE as f32 / 2.0 - PADDING, 
+        0.0 + SIZE as f32 / 2.0 + PADDING, 
         10.0
     );
 
     commands.spawn((
         SpriteBundle {
             sprite: Sprite {
-                custom_size: Some(Vec2::splat(PAUSEBUTTON_SIZE)),
+                custom_size: Some(Vec2::splat(SIZE)),
                 ..default()
             },
             texture: asset_server.load(PATH_IMAGE_PAUSEBUTTON),
@@ -75,7 +75,7 @@ fn update(
 
     let distance = cursor_pos.distance(pausebutton_pos);
 
-    if distance < PAUSEBUTTON_SIZE - CURSOR_RANGE {
+    if distance < SIZE - CURSOR_RANGE {
         if atlas.index == prop.first {
             atlas.index = prop.last;
             app_state.set(AppState::Pause);
