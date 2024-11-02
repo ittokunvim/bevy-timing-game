@@ -3,13 +3,31 @@ use bevy_ecs_ldtk::prelude::*;
 
 use crate::{
     WINDOW_SIZE,
-    PATH_IMAGE_CHARACTER_IDLE,
+    PATH_IMAGE_CHARACTER,
     AppState,
+};
+use crate::ingame::{
+    PerfectEvent,
+    GoodEvent,
+    OkEvent,
+    BadEvent,
 };
 use crate::ingame::bar::GRID_SIZE;
 
-const CHARACTER_IMAGE_SIZE: u32 = 32;
-const CHARACTER_SIZE: f32 = 64.0;
+const IMAGE_SIZE: u32 = 32;
+const SIZE: f32 = 64.0;
+const COLUMN: u32 = 4;
+const ROW: u32 = 5;
+const IDLE_RANGE: (usize, usize) = (0, 3);
+const IDLE_SECS: f32 = 0.2;
+const PERFECT_RANGE: (usize, usize) = (4, 6);
+const PERFECT_SECS: f32 = 0.3;
+const GOOD_RANGE: (usize, usize) = (8, 11);
+const GOOD_SECS: f32 = 0.2;
+const OK_RANGE: (usize, usize) = (12, 14);
+const OK_SECS: f32 = 0.3;
+const BAD_RANGE: (usize, usize) = (16, 18);
+const BAD_SECS: f32 = 0.3;
 
 #[derive(Default, Component, Debug)]
 struct Character {
@@ -17,7 +35,7 @@ struct Character {
     last: usize,
 }
 
-#[derive(Component, Deref, DerefMut)]
+#[derive(Default, Component, Deref, DerefMut, Debug)]
 struct AnimationTimer(Timer);
 
 fn setup(
@@ -29,9 +47,9 @@ fn setup(
     // Ldtk project
     if !ldtk_project_entities.is_empty() { return }
 
-    let layout = TextureAtlasLayout::from_grid(UVec2::splat(CHARACTER_IMAGE_SIZE), 4, 1, None, None);
+    let layout = TextureAtlasLayout::from_grid(UVec2::splat(IMAGE_SIZE), COLUMN, ROW, None, None);
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
-    let animation_indices = Character { first: 0, last: 3 };
+    let animation_indices = Character { first: IDLE_RANGE.0, last: IDLE_RANGE.1 };
     let pos = Vec3::new(
         WINDOW_SIZE.x / 2.0,
         WINDOW_SIZE.y / 2.0 + GRID_SIZE as f32 * 4.0,
@@ -41,10 +59,10 @@ fn setup(
     commands.spawn((
         SpriteBundle {
             sprite: Sprite {
-                custom_size: Some(Vec2::splat(CHARACTER_SIZE)),
+                custom_size: Some(Vec2::splat(SIZE)),
                 ..default()
             },
-            texture: asset_server.load(PATH_IMAGE_CHARACTER_IDLE),
+            texture: asset_server.load(PATH_IMAGE_CHARACTER),
             transform: Transform::from_translation(pos),
             ..default()
         },
@@ -53,16 +71,46 @@ fn setup(
             index: animation_indices.first,
         },
         animation_indices,
-        AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating))
+        AnimationTimer(Timer::from_seconds(IDLE_SECS, TimerMode::Repeating))
     ))
     .insert(Name::new("character"));
 }
 
 fn update(
+    mut query: Query<(&mut Character, &mut AnimationTimer, &mut TextureAtlas)>,
+    mut perfect_events: EventReader<PerfectEvent>,
+    mut good_events: EventReader<GoodEvent>,
+    mut ok_events: EventReader<OkEvent>,
+    mut bad_events: EventReader<BadEvent>,
     time: Res<Time>,
-    mut query: Query<(&Character, &mut AnimationTimer, &mut TextureAtlas)>,
 ) {
-    let Ok((prop, mut timer, mut atlas)) = query.get_single_mut() else { return };
+    let Ok((mut prop, mut timer, mut atlas)) = query.get_single_mut() else { return };
+    let atlas_index = atlas.index;
+    let mut closure = |range, secs| {
+        (prop.first, prop.last) = range;
+        atlas.index = range.0;
+        timer.0 = Timer::from_seconds(secs, TimerMode::Repeating);
+    };
+
+    if !perfect_events.is_empty() {
+        perfect_events.clear();
+        closure(PERFECT_RANGE, PERFECT_SECS);
+    }
+    if !good_events.is_empty() {
+        good_events.clear();
+        closure(GOOD_RANGE, GOOD_SECS);
+    }
+    if !ok_events.is_empty() {
+        ok_events.clear();
+        closure(OK_RANGE, OK_SECS);
+    }
+    if !bad_events.is_empty() {
+        bad_events.clear();
+        closure(BAD_RANGE, BAD_SECS);
+    }
+    if [PERFECT_RANGE.1, GOOD_RANGE.1, OK_RANGE.1, BAD_RANGE.1].contains(&atlas_index) {
+        closure(IDLE_RANGE, IDLE_SECS);
+    }
 
     timer.tick(time.delta());
     if timer.just_finished() {
