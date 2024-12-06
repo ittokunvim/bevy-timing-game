@@ -4,20 +4,18 @@ use bevy::{
 };
 
 use crate::{
-    WINDOW_SIZE,
     CURSOR_RANGE,
     PATH_IMAGE_TIMINGBUTTON,
     AppState,
+    Config,
 };
 use crate::ingame::TimingEvent;
-use crate::ingame::bar::GRID_SIZE;
 
 const IMAGE_SIZE: u32 = 64;
 const SIZE: f32 = 64.0;
 
-#[derive(Default, Component, Debug)]
+#[derive(Component)]
 struct TimingButton {
-    pushed: bool,
     first: usize,
     last: usize,
 }
@@ -29,16 +27,14 @@ fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
+    config: Res<Config>,
 ) {
+    if !config.setup_ingame { return }
+
     println!("timingbutton: setup");
     let layout = TextureAtlasLayout::from_grid(UVec2::splat(IMAGE_SIZE), 2, 1, None, None);
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
-    let animation_indices = TimingButton { pushed: false, first: 0, last: 1 };
-    let timingbtn_pos = Vec3::new(
-        WINDOW_SIZE.x / 2.0,
-        WINDOW_SIZE.y / 2.0 - GRID_SIZE * 2.0,
-        5.0
-    );
+    let animation_indices = TimingButton { first: 0, last: 1 };
 
     commands.spawn((
         SpriteBundle {
@@ -47,7 +43,7 @@ fn setup(
                 ..Default::default()
             },
             texture: asset_server.load(PATH_IMAGE_TIMINGBUTTON),
-            transform: Transform::from_translation(timingbtn_pos),
+            transform: Transform::from_xyz(0.0, 0.0, 0.0),
             ..Default::default()
         },
         TextureAtlas {
@@ -61,7 +57,7 @@ fn setup(
 }
 
 fn update(
-    mut query: Query<(&Transform, &mut TimingButton, &mut TextureAtlas), With<TimingButton>>,
+    mut query: Query<(&mut TextureAtlas, &Transform, &TimingButton), With<TimingButton>>,
     mut timing_events: EventWriter<TimingEvent>,
     mouse_events: Res<ButtonInput<MouseButton>>,
     window_query: Query<&Window, With<PrimaryWindow>>,
@@ -70,33 +66,42 @@ fn update(
 
     let window = window_query.single();
     let mut cursor_pos = window.cursor_position().unwrap();
-    let Ok((transform, mut prop, mut atlas)) = query.get_single_mut() else { return };
+    let Ok((mut atlas, transform, prop)) = query.get_single_mut() else { return };
     let timingbtn_pos = transform.translation.truncate();
-    cursor_pos = Vec2::new(cursor_pos.x, -cursor_pos.y + WINDOW_SIZE.y);
+    cursor_pos = Vec2::new(
+        cursor_pos.x - window.width() / 2.0, 
+        -cursor_pos.y + window.height() / 2.0,
+    );
 
     let distance = cursor_pos.distance(timingbtn_pos);
 
     if distance < SIZE - CURSOR_RANGE {
         timing_events.send_default();
-        prop.pushed = true;
-        println!("timingbutton: toggled");
+        println!("timingbutton: push");
         atlas.index = prop.last;
      }
 }
 
 fn animation(
+    mut query: Query<(&mut TextureAtlas, &mut AnimationTimer, &TimingButton), With<TimingButton>>,
     time: Res<Time>,
-    mut query: Query<(&mut TimingButton, &mut AnimationTimer, &mut TextureAtlas), With<TimingButton>>,
 ) {
-    let Ok((mut prop, mut timer, mut atlas)) = query.get_single_mut() else { return };
+    let Ok((mut atlas, mut timer, prop)) = query.get_single_mut() else { return };
 
-    if !prop.pushed { return }
+    if atlas.index == prop.first { return }
 
     timer.tick(time.delta());
     if timer.just_finished() {
-        prop.pushed = false;
         atlas.index = prop.first;
     }
+}
+
+fn despawn(
+    mut commands: Commands,
+    query: Query<Entity, With<TimingButton>>,
+) {
+    println!("timingbutton: despawn");
+    for entity in query.iter() { commands.entity(entity).despawn() }
 }
 
 pub struct TimingButtonPlugin;
@@ -105,8 +110,11 @@ impl Plugin for TimingButtonPlugin {
     fn build(&self, app: &mut App) {
         app
             .add_systems(OnEnter(AppState::Ingame), setup)
-            .add_systems(Update, update.run_if(in_state(AppState::Ingame)))
-            .add_systems(Update, animation.run_if(in_state(AppState::Ingame)))
+            .add_systems(Update, (
+                update,
+                animation,
+            ).run_if(in_state(AppState::Ingame)))
+            .add_systems(OnEnter(AppState::Mainmenu), despawn)
         ;
     }
 }

@@ -124,6 +124,7 @@ pub fn setup(
         MaterialMesh2dBundle {
             mesh: Mesh2dHandle(meshes.add(Rectangle::new(BOARD_SIZE.x, BOARD_SIZE.y))),
             material: materials.add(BOARD_COLOR),
+            transform: Transform::from_xyz(0.0, 0.0, 10.0),
             ..Default::default()
         },
         Gameclear,

@@ -106,7 +106,6 @@ fn send_events(
     }
     // bad
     else {
-        println!("cue: bad");
         bad_events.send_default();
     }
 }
