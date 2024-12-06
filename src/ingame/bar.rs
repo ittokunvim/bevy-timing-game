@@ -20,7 +20,11 @@ fn setup(
     if !config.setup_ingame { return }
 
     println!("bar: setup");
-    let y = GRID_SIZE * 10.0;
+    let (x, y, z): (f32, f32, f32) = (
+        0.0,
+        GRID_SIZE * 10.0,
+        10.0,
+    );
 
     commands.spawn((
         SpriteBundle {
@@ -29,7 +33,7 @@ fn setup(
                 ..Default::default()
             },
             texture: asset_server.load(PATH_IMAGE_BAR),
-            transform: Transform::from_xyz(0.0, y, 0.0),
+            transform: Transform::from_xyz(x, y, z),
             ..Default::default()
         },
         Bar,
