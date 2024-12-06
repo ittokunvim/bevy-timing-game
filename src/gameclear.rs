@@ -9,10 +9,12 @@ use crate::{
     PATH_FONT_BOLD,
     AppState,
     Config,
+    Score,
 };
 
-const GAMEOVER_TEXT: &str = "Game Over";
-const GAMEOVER_SIZE: f32 = 32.0;
+const GAMECLEAR_TEXT: &str = "Game Clear";
+const GAMECLEAR_SIZE: f32 = 32.0;
+const SCORE_TEXT: &str = "Score: ";
 const RETRY_TEXT: &str = "Retry: Key[R]";
 const BACKTOTITLE_TEXT: &str = "Back to Title: Key[B]";
 const BOARD_SIZE: Vec2 = Vec2::new(240.0, 240.0);
@@ -22,24 +24,25 @@ const TEXT_COLOR: Color = Color::srgb(0.1, 0.1, 0.1);
 const TEXT_PADDING: f32 = 50.0;
 
 #[derive(Component)]
-pub struct Gameover;
+pub struct Gameclear;
 
 pub fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
     asset_server: Res<AssetServer>,
+    score: Res<Score>,
 ) {
-    println!("gameover: setup");
-    // gameover
-    let top = Val::Px(WINDOW_SIZE.y / 2.0 - GAMEOVER_SIZE / 2.0 - TEXT_PADDING);
+    println!("gameclear: setup");
+    // gameclear
+    let top = Val::Px(WINDOW_SIZE.y / 2.0 - GAMECLEAR_SIZE / 2.0 - TEXT_PADDING * 1.5);
 
     commands.spawn((
         TextBundle::from_section(
-            GAMEOVER_TEXT,
+            GAMECLEAR_TEXT,
             TextStyle {
                 font: asset_server.load(PATH_FONT_BOLD),
-                font_size: GAMEOVER_SIZE,
+                font_size: GAMECLEAR_SIZE,
                 color: TEXT_COLOR,
             },
         )
@@ -47,13 +50,35 @@ pub fn setup(
             position_type: PositionType::Relative,
             top,
             justify_self: JustifySelf::Center,
-                ..Default::default()
+            ..Default::default()
         }),
-        Gameover,
+        Gameclear,
     ))
-    .insert(Name::new("gameover"));
+    .insert(Name::new("gameclear"));
+    // score
+    let text = format!("{}{}", SCORE_TEXT, score.to_string());
+    let top = Val::Px(WINDOW_SIZE.y / 2.0 - TEXT_SIZE / 2.0 - TEXT_PADDING * 0.5);
+
+    commands.spawn((
+        TextBundle::from_section(
+            text,
+            TextStyle {
+                font: asset_server.load(PATH_FONT_MEDIUM),
+                font_size: TEXT_SIZE,
+                color: TEXT_COLOR,
+            },
+        )
+        .with_style(Style {
+            position_type: PositionType::Relative,
+            justify_self: JustifySelf::Center,
+            top,
+            ..Default::default()
+        }),
+        Gameclear,
+    ))
+    .insert(Name::new("score"));
     // retry
-    let top = Val::Px(WINDOW_SIZE.y / 2.0 - TEXT_SIZE / 2.0);
+    let top = Val::Px(WINDOW_SIZE.y / 2.0 - TEXT_SIZE / 2.0 + TEXT_PADDING * 0.5);
 
     commands.spawn((
         TextBundle::from_section(
@@ -70,20 +95,20 @@ pub fn setup(
             top,
             ..Default::default()
         }),
-        Gameover,
+        Gameclear,
     ))
     .insert(Name::new("retry"));
     // back to title
-    let top = Val::Px(WINDOW_SIZE.y / 2.0 - TEXT_SIZE / 2.0 + TEXT_PADDING);
+    let top = Val::Px(WINDOW_SIZE.y / 2.0 - TEXT_SIZE / 2.0 + TEXT_PADDING * 1.5);
 
     commands.spawn((
         TextBundle::from_section(
-            BACKTOTITLE_TEXT,
+            BACKTOTITLE_TEXT, 
             TextStyle {
                 font: asset_server.load(PATH_FONT_MEDIUM),
                 font_size: TEXT_SIZE,
                 color: TEXT_COLOR,
-            },
+            }
         )
         .with_style(Style {
             position_type: PositionType::Relative,
@@ -91,7 +116,7 @@ pub fn setup(
             top,
             ..Default::default()
         }),
-        Gameover,
+        Gameclear,
     ))
     .insert(Name::new("backtotitle"));
     // board
@@ -101,7 +126,7 @@ pub fn setup(
             material: materials.add(BOARD_COLOR),
             ..Default::default()
         },
-        Gameover,
+        Gameclear,
     ))
     .insert(Name::new("board"));
 }
@@ -112,9 +137,9 @@ fn update(
     keyboard_input: Res<ButtonInput<KeyCode>>,
 ) {
     let mut closure = |app_state: AppState| {
-        println!("gameover: change config.setup_ingame to false");
+        println!("gameclear: config setup ingame is false");
         config.setup_ingame = false;
-        println!("gameover: moved state to {:?} from Gameover", app_state);
+        println!("gameclear: moved state to {:?} from Gameclear", app_state);
         next_state.set(app_state);
     };
 
@@ -129,20 +154,20 @@ fn update(
 
 fn despawn(
     mut commands: Commands,
-    query: Query<Entity, With<Gameover>>,
+    query: Query<Entity, With<Gameclear>>,
 ) {
-    println!("gameover: despawn");
+    println!("gameclear: despawn");
     for entity in query.iter() { commands.entity(entity).despawn() }
 }
 
-pub struct GameoverPlugin;
+pub struct GameclearPlugin;
 
-impl Plugin for GameoverPlugin {
+impl Plugin for GameclearPlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_systems(OnEnter(AppState::Gameover), setup)
-            .add_systems(Update, update.run_if(in_state(AppState::Gameover)))
-            .add_systems(OnExit(AppState::Gameover), despawn)
+            .add_systems(OnEnter(AppState::Gameclear), setup)
+            .add_systems(Update, update.run_if(in_state(AppState::Gameclear)))
+            .add_systems(OnExit(AppState::Gameclear), despawn)
         ;
     }
 }

@@ -129,7 +129,7 @@ impl Plugin for CuePlugin {
                 apply_velocity,
                 send_events,
             ).run_if(in_state(AppState::Ingame)))
-            .add_systems(OnEnter(AppState::Gameover), despawn)
+            .add_systems(OnEnter(AppState::Mainmenu), despawn)
         ;
     }
 }

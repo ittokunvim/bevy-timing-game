@@ -55,7 +55,7 @@ impl Plugin for BarPlugin {
     fn build(&self, app: &mut App) {
         app
             .add_systems(OnEnter(AppState::Ingame), setup)
-            .add_systems(OnEnter(AppState::Gameover), despawn)
+            .add_systems(OnEnter(AppState::Mainmenu), despawn)
         ;
     }
 }

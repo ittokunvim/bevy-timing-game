@@ -11,6 +11,7 @@ mod sounds;
 mod timer;
 mod timingbutton;
 
+const GRID_SIZE: f32 = 16.0;
 const GAMETIME_LIMIT: f32 = 5.0;
 
 #[derive(Event, Default)]

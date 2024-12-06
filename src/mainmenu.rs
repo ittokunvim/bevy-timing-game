@@ -7,6 +7,7 @@ use crate::{
     PATH_FONT_BOLD,
     PATH_IMAGE_MAINMENU,
     AppState,
+    Config,
 };
 
 const GAMETITLE_SIZE: f32 = 40.0;
@@ -79,11 +80,14 @@ fn setup(
 fn update(
     mut commands: Commands,
     mut next_state: ResMut<NextState<AppState>>,
+    mut config: ResMut<Config>, 
     mouse_events: Res<ButtonInput<MouseButton>>,
     query: Query<Entity, With<Mainmenu>>,
 ) {
     if !mouse_events.just_pressed(MouseButton::Left) { return }
 
+    println!("mainmenu: config setup ingame is true");
+    config.setup_ingame = true;
     println!("mainmenu: despawn");
     for entity in query.iter() { commands.entity(entity).despawn() }
     println!("mainmenu: moved state to Ingame from Mainmeu");
