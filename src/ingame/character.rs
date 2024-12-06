@@ -29,30 +29,31 @@ const OK_SECS: f32 = 0.3;
 const BAD_RANGE: (usize, usize) = (16, 18);
 const BAD_SECS: f32 = 0.3;
 
-#[derive(Default, Component, Debug)]
+#[derive(Component)]
 struct Character {
     first: usize,
     last: usize,
 }
 
-#[derive(Default, Component, Deref, DerefMut, Debug)]
+#[derive(Component, Deref, DerefMut)]
 struct AnimationTimer(Timer);
 
 fn setup(
     mut commands: Commands,
+    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
     asset_server: Res<AssetServer>,
     ldtk_project_entities: Query<&Handle<LdtkProject>>,
-    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
     // Ldtk project
     if !ldtk_project_entities.is_empty() { return }
 
+    println!("character: setup");
     let layout = TextureAtlasLayout::from_grid(UVec2::splat(IMAGE_SIZE), COLUMN, ROW, None, None);
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
     let animation_indices = Character { first: IDLE_RANGE.0, last: IDLE_RANGE.1 };
     let pos = Vec3::new(
         WINDOW_SIZE.x / 2.0,
-        WINDOW_SIZE.y / 2.0 + GRID_SIZE as f32 * 4.0,
+        WINDOW_SIZE.y / 2.0 + GRID_SIZE * 4.0,
         5.0
     );
 
@@ -60,11 +61,11 @@ fn setup(
         SpriteBundle {
             sprite: Sprite {
                 custom_size: Some(Vec2::splat(SIZE)),
-                ..default()
+                ..Default::default()
             },
             texture: asset_server.load(PATH_IMAGE_CHARACTER),
             transform: Transform::from_translation(pos),
-            ..default()
+            ..Default::default()
         },
         TextureAtlas {
             layout: texture_atlas_layout,
@@ -93,22 +94,27 @@ fn update(
     };
 
     if !perfect_events.is_empty() {
+        println!("character: perfect");
         perfect_events.clear();
         closure(PERFECT_RANGE, PERFECT_SECS);
     }
-    if !good_events.is_empty() {
+    else if !good_events.is_empty() {
+        println!("character: good");
         good_events.clear();
         closure(GOOD_RANGE, GOOD_SECS);
     }
-    if !ok_events.is_empty() {
+    else if !ok_events.is_empty() {
+        println!("character: ok");
         ok_events.clear();
         closure(OK_RANGE, OK_SECS);
     }
-    if !bad_events.is_empty() {
+    else if !bad_events.is_empty() {
+        println!("character: bad");
         bad_events.clear();
         closure(BAD_RANGE, BAD_SECS);
     }
-    if [PERFECT_RANGE.1, GOOD_RANGE.1, OK_RANGE.1, BAD_RANGE.1].contains(&atlas_index) {
+
+    if [PERFECT_RANGE.1, GOOD_RANGE.1, OK_RANGE.1, BAD_RANGE.1,].contains(&atlas_index) {
         closure(IDLE_RANGE, IDLE_SECS);
     }
 
@@ -124,6 +130,7 @@ impl Plugin for CharacterPlugin {
     fn build(&self, app: &mut App) {
         app
             .add_systems(OnEnter(AppState::Ingame), setup)
-            .add_systems(Update, update.run_if(in_state(AppState::Ingame)));
+            .add_systems(Update, update.run_if(in_state(AppState::Ingame)))
+        ;
     }
 }

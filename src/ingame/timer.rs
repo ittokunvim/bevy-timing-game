@@ -5,13 +5,14 @@ use crate::ingame::GameTimer;
 
 fn update(
     mut timer: ResMut<GameTimer>,
+    mut next_state: ResMut<NextState<AppState>>,
     time: Res<Time>,
-    mut app_state: ResMut<NextState<AppState>>,
 ) {
     if timer.0.tick(time.delta()).just_finished() {
+        println!("timer: reset");
         timer.0.reset();
-        // Move app state
-        app_state.set(AppState::Gameover);
+        println!("timer: moved state to Gameover from Ingame");
+        next_state.set(AppState::Gameover);
     }
 }
 
@@ -20,6 +21,7 @@ pub struct GameTimerPlugin;
 impl Plugin for GameTimerPlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_systems(Update, update.run_if(in_state(AppState::Ingame)));
+            .add_systems(Update, update.run_if(in_state(AppState::Ingame)))
+        ;
     }
 }

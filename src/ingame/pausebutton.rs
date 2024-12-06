@@ -15,7 +15,7 @@ const IMAGE_SIZE: u32 = 64;
 const SIZE: f32 = 32.0;
 const PADDING: f32 = 5.0;
 
-#[derive(Default, Component, Debug)]
+#[derive(Component)]
 struct PauseButton {
     first: usize,
     last: usize,
@@ -23,31 +23,32 @@ struct PauseButton {
 
 fn setup(
     mut commands: Commands,
+    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
     asset_server: Res<AssetServer>,
     ldtk_project_entities: Query<&Handle<LdtkProject>>,
-    mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
     // Ldtk project
     if !ldtk_project_entities.is_empty() { return }
 
+    println!("pausebutton: setup");
     let layout = TextureAtlasLayout::from_grid(UVec2::splat(IMAGE_SIZE), 2, 1, None, None);
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
     let animation_indices = PauseButton { first: 0, last: 1 };
     let pos = Vec3::new(
-        WINDOW_SIZE.x - SIZE as f32 / 2.0 - PADDING, 
-        0.0 + SIZE as f32 / 2.0 + PADDING, 
-        10.0
+        WINDOW_SIZE.x - SIZE / 2.0 - PADDING, 
+        0.0 + SIZE / 2.0 + PADDING, 
+        99.0
     );
 
     commands.spawn((
         SpriteBundle {
             sprite: Sprite {
                 custom_size: Some(Vec2::splat(SIZE)),
-                ..default()
+                ..Default::default()
             },
             texture: asset_server.load(PATH_IMAGE_PAUSEBUTTON),
             transform: Transform::from_translation(pos),
-            ..default()
+            ..Default::default()
         },
         TextureAtlas {
             layout: texture_atlas_layout,
@@ -59,29 +60,32 @@ fn setup(
 }
 
 fn update(
-    mouse_event: Res<ButtonInput<MouseButton>>,
-    window_query: Query<&Window, With<PrimaryWindow>>,
     mut query: Query<(&Transform, &PauseButton, &mut TextureAtlas), With<PauseButton>>,
-    mut app_state: ResMut<NextState<AppState>>,
+    mut next_state: ResMut<NextState<AppState>>,
+    mouse_events: Res<ButtonInput<MouseButton>>,
+    window_query: Query<&Window, With<PrimaryWindow>>,
 ) {
-    if !mouse_event.just_pressed(MouseButton::Left) { return; }
+    if !mouse_events.just_pressed(MouseButton::Left) { return }
 
     let window = window_query.single();
     let mut cursor_pos = window.cursor_position().unwrap();
-    let Ok((transform, prop, mut atlas)) = query.get_single_mut() else { return; };
+    let Ok((transform, prop, mut atlas)) = query.get_single_mut() else { return };
     let pausebutton_pos = transform.translation.truncate();
-    // get cursor position
     cursor_pos = Vec2::new(cursor_pos.x, -cursor_pos.y + WINDOW_SIZE.y);
 
     let distance = cursor_pos.distance(pausebutton_pos);
 
     if distance < SIZE - CURSOR_RANGE {
         if atlas.index == prop.first {
+            println!("pausebutton: toggled");
             atlas.index = prop.last;
-            app_state.set(AppState::Pause);
+            println!("pausebutton: moved state to Pause from Ingame");
+            next_state.set(AppState::Pause);
         } else {
+            println!("pausebutton: toggled");
             atlas.index = prop.first;
-            app_state.set(AppState::Ingame);
+            println!("pausebutton: moved state to Ingame from Pause");
+            next_state.set(AppState::Ingame);
         }
     }
 }
@@ -93,6 +97,7 @@ impl Plugin for PauseButtonPlugin {
         app
             .add_systems(OnEnter(AppState::Ingame), setup)
             .add_systems(Update, update.run_if(in_state(AppState::Ingame)))
-            .add_systems(Update, update.run_if(in_state(AppState::Pause)));
+            .add_systems(Update, update.run_if(in_state(AppState::Pause)))
+        ;
     }
 }

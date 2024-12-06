@@ -9,11 +9,12 @@ use crate::{
     AppState,
 };
 
-const GAMETITLE_FONT_SIZE: f32 = 40.0;
+const GAMETITLE_SIZE: f32 = 40.0;
 const GAMETITLE_COLOR: Color = Color::srgb(0.1, 0.1, 0.1);
 const CLICKSTART_TEXT: &str = "Click Start...";
-const CLICKSTART_FONT_SIZE: f32 = 30.0;
 const CLICKSTART_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
+const TEXT_SIZE: f32 = 30.0;
+const TEXT_PADDING: Val = Val::Px(16.0);
 
 #[derive(Component)]
 struct Mainmenu;
@@ -22,69 +23,71 @@ fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
 ) {
-    // Game title
+    println!("mainmenu: setup");
+    // game title
+    let top = Val::Px(WINDOW_SIZE.y / 2.0 - GAMETITLE_SIZE / 2.0);
+
     commands.spawn((
         TextBundle::from_section(
             GAMETITLE,
             TextStyle {
                 font: asset_server.load(PATH_FONT_BOLD),
-                font_size: GAMETITLE_FONT_SIZE,
+                font_size: GAMETITLE_SIZE,
                 color: GAMETITLE_COLOR,
             }
         )
         .with_style(Style {
             position_type: PositionType::Relative,
             justify_self: JustifySelf::Center,
-            top: Val::Px(WINDOW_SIZE.y / 2.0 - GAMETITLE_FONT_SIZE / 2.0),
-            ..default()
+            top,
+            ..Default::default()
         }),
         Mainmenu,
     ))
     .insert(Name::new("game_title"));
-    // Click start
+    // click start
     commands.spawn((
         TextBundle::from_section(
             CLICKSTART_TEXT,
             TextStyle {
                 font: asset_server.load(PATH_FONT_MEDIUM),
-                font_size: CLICKSTART_FONT_SIZE,
+                font_size: TEXT_SIZE,
                 color: CLICKSTART_COLOR,
             },
         )
         .with_style(Style {
             position_type: PositionType::Absolute,
-            right: Val::Px(16.0),
-            bottom: Val::Px(16.0),
-            ..default()
+            right: TEXT_PADDING,
+            bottom: TEXT_PADDING,
+            ..Default::default()
         }),
         Mainmenu,
     ))
     .insert(Name::new("click_start"));
-    // Background image
+    // image
     commands.spawn((
         SpriteBundle {
             texture: asset_server.load(PATH_IMAGE_MAINMENU),
-            ..default()
+            transform: Transform::from_xyz(0.0, 0.0, -10.0),
+            ..Default::default()
         },
         Mainmenu,
     ))
-    .insert(Name::new("bg_image"));
+    .insert(Name::new("image"));
 }
 
 fn update(
-    mouse_event: Res<ButtonInput<MouseButton>>,
-    mainmenu_query: Query<Entity, With<Mainmenu>>,
     mut commands: Commands,
-    mut app_state: ResMut<NextState<AppState>>,
+    mut next_state: ResMut<NextState<AppState>>,
+    mouse_events: Res<ButtonInput<MouseButton>>,
+    query: Query<Entity, With<Mainmenu>>,
 ) {
-    if mouse_event.just_pressed(MouseButton::Left) {
-        // despawn mainmenu entities
-        for mainmenu_entity in mainmenu_query.iter() {
-            commands.entity(mainmenu_entity).despawn();
-        }
-        // change app state
-        app_state.set(AppState::Ingame);
-    }
+    if !mouse_events.just_pressed(MouseButton::Left) { return }
+
+    println!("mainmenu: despawn");
+    for entity in query.iter() { commands.entity(entity).despawn() }
+    println!("mainmenu: moved state to Ingame from Mainmeu");
+    next_state.set(AppState::Ingame);
 }
 
 pub struct MainmenuPlugin;
@@ -93,6 +96,7 @@ impl Plugin for MainmenuPlugin {
     fn build(&self, app: &mut App) {
         app
             .add_systems(OnEnter(AppState::Mainmenu), setup)
-            .add_systems(Update, update.run_if(in_state(AppState::Mainmenu)));
+            .add_systems(Update, update.run_if(in_state(AppState::Mainmenu)))
+        ;
     }
 }

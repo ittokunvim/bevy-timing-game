@@ -5,14 +5,14 @@ mod camera;
 mod character;
 mod cue;
 // mod effects;
-mod gametimer;
 mod ldtk;
 mod pausebutton;
 mod scoreboard;
 mod sounds;
+mod timer;
 mod timingbutton;
 
-const GAMETIME_LIMIT: f32 = 10.0;
+const GAMETIME_LIMIT: f32 = 5.0;
 
 #[derive(Event, Default)]
 struct PerfectEvent;
@@ -46,17 +46,19 @@ impl Plugin for IngamePlugin {
             .add_event::<BadEvent>()
             .add_event::<TimingEvent>()
             .add_event::<ReversalEvent>()
-            .insert_resource(GameTimer(Timer::from_seconds(GAMETIME_LIMIT, TimerMode::Once)))
+            .insert_resource(
+                GameTimer(Timer::from_seconds(GAMETIME_LIMIT, TimerMode::Once))
+            )
             .add_plugins(bar::BarPlugin)
             .add_plugins(camera::CameraPlugin)
             .add_plugins(character::CharacterPlugin)
             .add_plugins(cue::CuePlugin)
             // .add_plugins(effects::EffectsPlugin)
-            .add_plugins(gametimer::GameTimerPlugin)
             .add_plugins(ldtk::LdtkPlugin)
             .add_plugins(pausebutton::PauseButtonPlugin)
             .add_plugins(scoreboard::ScoreboardPlugin)
             .add_plugins(sounds::SoundsPlugin)
+            .add_plugins(timer::GameTimerPlugin)
             .add_plugins(timingbutton::TimingButtonPlugin);
     }
 }

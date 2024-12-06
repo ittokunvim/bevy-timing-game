@@ -19,6 +19,7 @@ pub struct CameraPlugin;
 impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_systems(OnEnter(AppState::Ingame), setup);
+            .add_systems(OnEnter(AppState::Ingame), setup)
+        ;
     }
 }

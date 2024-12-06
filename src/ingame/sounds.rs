@@ -40,17 +40,21 @@ fn setup(
 ) {
     // Ldtk project
     if !ldtk_project_entities.is_empty() { return }
+    println!("sounds: setup");
 
     let perfect_sound = asset_server.load(PATH_SOUND_PERFECT);
-    let good_sound = asset_server.load(PATH_SOUND_GOOD);
-    let ok_sound = asset_server.load(PATH_SOUND_OK);
-    let timing_sound = asset_server.load(PATH_SOUND_TIMING);
-    let reversal_sound = asset_server.load(PATH_SOUND_REVERSAL);
-
     commands.insert_resource(PerfectSound(perfect_sound));
+
+    let good_sound = asset_server.load(PATH_SOUND_GOOD);
     commands.insert_resource(GoodSound(good_sound));
+
+    let ok_sound = asset_server.load(PATH_SOUND_OK);
     commands.insert_resource(OkSound(ok_sound));
+
+    let timing_sound = asset_server.load(PATH_SOUND_TIMING);
     commands.insert_resource(TimingSound(timing_sound));
+
+    let reversal_sound = asset_server.load(PATH_SOUND_REVERSAL);
     commands.insert_resource(ReversalSound(reversal_sound));
 }
 
@@ -61,7 +65,7 @@ fn play_perfect_sound(
 ) {
     if events.is_empty() { return }
     events.clear();
-    // play perfect sound
+    println!("sounds: perfect");
     commands.spawn(AudioBundle {
         source: sound.clone(),
         settings: PlaybackSettings::DESPAWN,
@@ -75,7 +79,7 @@ fn play_good_sound(
 ) {
     if events.is_empty() { return }
     events.clear();
-    // play good sound
+    println!("sounds: good");
     commands.spawn(AudioBundle {
         source: sound.clone(),
         settings: PlaybackSettings::DESPAWN,
@@ -90,6 +94,7 @@ fn play_ok_sound(
     if events.is_empty() { return }
     events.clear();
     // play ok sound
+    println!("sounds: ok");
     commands.spawn(AudioBundle {
         source: sound.clone(),
         settings: PlaybackSettings::DESPAWN,
@@ -103,7 +108,7 @@ fn play_timing_sound(
 ) {
     if events.is_empty() { return }
     events.clear();
-    // play timing sound
+    println!("sounds: timing");
     commands.spawn(AudioBundle {
         source: sound.clone(),
         settings: PlaybackSettings::DESPAWN,
@@ -117,7 +122,7 @@ fn play_reversal_sound(
 ) {
     if events.is_empty() { return }
     events.clear();
-    // play reversal sound
+    println!("sounds: reversal");
     commands.spawn(AudioBundle {
         source: sound.clone(),
         settings: PlaybackSettings::DESPAWN,
@@ -136,6 +141,7 @@ impl Plugin for SoundsPlugin {
                 play_perfect_sound,
                 play_timing_sound,
                 play_reversal_sound,
-            ).run_if(in_state(AppState::Ingame)));
+            ).run_if(in_state(AppState::Ingame)))
+        ;
     }
 }

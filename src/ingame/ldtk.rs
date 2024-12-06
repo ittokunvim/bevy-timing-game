@@ -26,6 +26,7 @@ pub struct LdtkPlugin;
 impl Plugin for LdtkPlugin {
     fn build(&self, app: &mut App) {
         app
-            .add_systems(OnEnter(AppState::Ingame), setup);
+            .add_systems(OnEnter(AppState::Ingame), setup)
+        ;
     }
 }
