@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use bevy_ecs_ldtk::prelude::*;
 
 use crate::{
     PATH_FONT_MEDIUM,
@@ -32,11 +31,7 @@ struct ScoreboardUi;
 fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    ldtk_project_entities: Query<&Handle<LdtkProject>>,
 ) {
-    // Ldtk project
-    if !ldtk_project_entities.is_empty() { return }
-
     println!("scoreboard: setup");
     commands.spawn((
         TextBundle::from_sections([

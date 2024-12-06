@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use bevy_ecs_ldtk::prelude::*;
 
 use crate::{
     WINDOW_SIZE,
@@ -15,11 +14,7 @@ pub struct Bar;
 
 fn setup(
     mut commands: Commands,
-    ldtk_project_entities: Query<&Handle<LdtkProject>>,
 ) {
-    // Ldtk project
-    if !ldtk_project_entities.is_empty() { return }
-
     println!("bar: setup");
     let bar_y = WINDOW_SIZE.y - GRID_SIZE * 4.0 - SIZE.y / 2.0;
 

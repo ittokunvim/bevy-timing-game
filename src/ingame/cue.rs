@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use bevy_ecs_ldtk::prelude::*;
 
 use crate::AppState;
 use crate::ingame::{
@@ -20,13 +19,6 @@ use crate::ingame::bar::{
 #[derive(Default, Component)]
 pub struct Cue {
     pub toggle_move: bool,
-}
-
-#[derive(Default, Bundle, LdtkEntity)]
-struct CueBundle {
-    cue: Cue,
-    #[sprite_sheet_bundle]
-    sprite_sheet_bundle: LdtkSpriteSheetBundle,
 }
 
 const CUE_SPEED: f32 = 7.0;
@@ -102,7 +94,6 @@ pub struct CuePlugin;
 impl Plugin for CuePlugin {
     fn build(&self, app: &mut App) {
         app
-            .register_ldtk_entity::<CueBundle>("Cue")
             .add_systems(Update, (
                 movement,
                 send_events,

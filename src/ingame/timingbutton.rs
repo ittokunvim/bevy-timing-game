@@ -2,7 +2,6 @@ use bevy::{
     prelude::*,
     window::PrimaryWindow,
 };
-use bevy_ecs_ldtk::prelude::*;
 
 use crate::{
     WINDOW_SIZE,
@@ -29,12 +28,8 @@ struct AnimationTimer(Timer);
 fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    ldtk_project_entities: Query<&Handle<LdtkProject>>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
 ) {
-    // Ldtk project
-    if !ldtk_project_entities.is_empty() { return }
-
     println!("timingbutton: setup");
     let layout = TextureAtlasLayout::from_grid(UVec2::splat(IMAGE_SIZE), 2, 1, None, None);
     let texture_atlas_layout = texture_atlas_layouts.add(layout);

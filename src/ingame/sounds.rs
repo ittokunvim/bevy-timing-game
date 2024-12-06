@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use bevy_ecs_ldtk::prelude::*;
 
 use crate::{
     PATH_SOUND_GOOD,
@@ -36,12 +35,8 @@ struct ReversalSound(Handle<AudioSource>);
 fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
-    ldtk_project_entities: Query<&Handle<LdtkProject>>,
 ) {
-    // Ldtk project
-    if !ldtk_project_entities.is_empty() { return }
     println!("sounds: setup");
-
     let perfect_sound = asset_server.load(PATH_SOUND_PERFECT);
     commands.insert_resource(PerfectSound(perfect_sound));
 

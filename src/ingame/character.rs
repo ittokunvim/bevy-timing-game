@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use bevy_ecs_ldtk::prelude::*;
 
 use crate::{
     WINDOW_SIZE,
@@ -42,11 +41,7 @@ fn setup(
     mut commands: Commands,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
     asset_server: Res<AssetServer>,
-    ldtk_project_entities: Query<&Handle<LdtkProject>>,
 ) {
-    // Ldtk project
-    if !ldtk_project_entities.is_empty() { return }
-
     println!("character: setup");
     let layout = TextureAtlasLayout::from_grid(UVec2::splat(IMAGE_SIZE), COLUMN, ROW, None, None);
     let texture_atlas_layout = texture_atlas_layouts.add(layout);

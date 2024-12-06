@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use bevy_ecs_ldtk::prelude::*;
 // use bevy_hanabi::prelude::*;
 
 mod mainmenu;
@@ -53,9 +52,6 @@ fn main() {
         .insert_resource(ClearColor(BACKGROUND_COLOR))
         .insert_resource(Time::<Fixed>::from_seconds(1.0 / 60.0))
         .insert_resource(Score(0))
-        // Ldtk setup
-        .add_plugins(LdtkPlugin)
-        .insert_resource(LevelSelection::index(0))
         // // Hanabi setup
         // .add_plugins(HanabiPlugin)
         // Plugins
