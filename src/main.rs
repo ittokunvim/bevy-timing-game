@@ -21,7 +21,7 @@ pub const PATH_SOUND_OK: &str = "bevy-timing-game/ok.ogg";
 pub const PATH_FONT_MEDIUM: &str = "fonts/FiraMono-Medium.ttf";
 pub const PATH_FONT_BOLD: &str = "fonts/FiraSans-Bold.ttf";
 pub const PATH_IMAGE_PAUSEBUTTON: &str = "images/pausebutton-light.png";
-pub const PATH_SOUND_TIMING: &str = "sounds/click.ogg";
+pub const PATH_SOUND_CLICK: &str = "sounds/click.ogg";
 pub const PATH_SOUND_REVERSAL: &str = "sounds/reversal.ogg";
 
 const BACKGROUND_COLOR: Color = Color::srgb(0.25, 0.25, 0.25);
@@ -39,6 +39,9 @@ pub enum AppState {
 struct Config {
     setup_ingame: bool,
 }
+
+#[derive(Resource, Deref)]
+struct ClickSound(Handle<AudioSource>);
 
 #[derive(Resource, Deref, DerefMut)]
 pub struct Score(pub usize);
@@ -64,15 +67,35 @@ fn main() {
         // // Hanabi setup
         // .add_plugins(HanabiPlugin)
         // Plugins
-        .add_systems(Startup, setup_camera)
+        .add_systems(Startup, setup)
+        .add_systems(Update, update)
         .add_plugins(mainmenu::MainmenuPlugin)
         .add_plugins(ingame::IngamePlugin)
         .add_plugins(gameover::GameoverPlugin)
         .run();
 }
 
-fn setup_camera(mut commands: Commands) {
+fn setup(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+) {
     println!("main: setup");
     // camera
     commands.spawn(Camera2dBundle::default());
+    // click sound
+    let click_sound = asset_server.load(PATH_SOUND_CLICK);
+    commands.insert_resource(ClickSound(click_sound));
+}
+
+fn update(
+    mut commands: Commands,
+    mouse_events: Res<ButtonInput<MouseButton>>,
+    sound: Res<ClickSound>,
+) {
+    if !mouse_events.just_pressed(MouseButton::Left) { return }
+    // play click sound
+    commands.spawn(AudioBundle {
+        source: sound.clone(),
+        settings: PlaybackSettings::DESPAWN
+    });
 }

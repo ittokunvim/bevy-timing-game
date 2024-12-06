@@ -5,7 +5,6 @@ use crate::{
     PATH_SOUND_OK,
     PATH_SOUND_PERFECT,
     PATH_SOUND_REVERSAL,
-    PATH_SOUND_TIMING,
     AppState,
 };
 
@@ -14,7 +13,6 @@ use crate::ingame::{
     OkEvent,
     PerfectEvent,
     ReversalEvent,
-    TimingEvent,
 };
 
 #[derive(Resource, Deref)]
@@ -25,9 +23,6 @@ struct GoodSound(Handle<AudioSource>);
 
 #[derive(Resource, Deref)]
 struct OkSound(Handle<AudioSource>);
-
-#[derive(Resource, Deref)]
-struct TimingSound(Handle<AudioSource>);
 
 #[derive(Resource, Deref)]
 struct ReversalSound(Handle<AudioSource>);
@@ -45,9 +40,6 @@ fn setup(
 
     let ok_sound = asset_server.load(PATH_SOUND_OK);
     commands.insert_resource(OkSound(ok_sound));
-
-    let timing_sound = asset_server.load(PATH_SOUND_TIMING);
-    commands.insert_resource(TimingSound(timing_sound));
 
     let reversal_sound = asset_server.load(PATH_SOUND_REVERSAL);
     commands.insert_resource(ReversalSound(reversal_sound));
@@ -96,20 +88,6 @@ fn play_ok_sound(
     });
 }
 
-fn play_timing_sound(
-    mut events: EventReader<TimingEvent>,
-    mut commands: Commands,
-    sound: Res<TimingSound>,
-) {
-    if events.is_empty() { return }
-    events.clear();
-    println!("sounds: timing");
-    commands.spawn(AudioBundle {
-        source: sound.clone(),
-        settings: PlaybackSettings::DESPAWN,
-    });
-}
-
 fn play_reversal_sound(
     mut events: EventReader<ReversalEvent>,
     mut commands: Commands,
@@ -134,7 +112,6 @@ impl Plugin for SoundsPlugin {
                 play_good_sound,
                 play_ok_sound,
                 play_perfect_sound,
-                play_timing_sound,
                 play_reversal_sound,
             ).run_if(in_state(AppState::Ingame)))
         ;
