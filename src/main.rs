@@ -35,6 +35,11 @@ pub enum AppState {
     Gameover,
 }
 
+#[derive(Resource, Deref, DerefMut, Debug)]
+struct Config {
+    setup_ingame: bool,
+}
+
 #[derive(Resource, Deref, DerefMut)]
 pub struct Score(pub usize);
 
@@ -54,6 +59,7 @@ fn main() {
         .init_state::<AppState>()
         .insert_resource(ClearColor(BACKGROUND_COLOR))
         .insert_resource(Time::<Fixed>::from_seconds(1.0 / 60.0))
+        .insert_resource(Config { setup_ingame: true })
         .insert_resource(Score(0))
         // // Hanabi setup
         // .add_plugins(HanabiPlugin)
@@ -66,5 +72,7 @@ fn main() {
 }
 
 fn setup_camera(mut commands: Commands) {
+    println!("main: setup");
+    // camera
     commands.spawn(Camera2dBundle::default());
 }
