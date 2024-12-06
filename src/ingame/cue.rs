@@ -111,6 +111,14 @@ fn send_events(
     }
 }
 
+fn despawn(
+    mut commands: Commands,
+    query: Query<Entity, With<Cue>>,
+) {
+    println!("cue: despawn");
+    for entity in query.iter() { commands.entity(entity).despawn() }
+}
+
 pub struct CuePlugin;
 
 impl Plugin for CuePlugin {
@@ -121,6 +129,7 @@ impl Plugin for CuePlugin {
                 apply_velocity,
                 send_events,
             ).run_if(in_state(AppState::Ingame)))
+            .add_systems(OnEnter(AppState::Gameover), despawn)
         ;
     }
 }
