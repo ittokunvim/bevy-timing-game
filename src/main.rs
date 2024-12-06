@@ -8,18 +8,21 @@ mod gameover;
 pub const GAMETITLE: &str = "Timing Game";
 pub const WINDOW_SIZE: Vec2 = Vec2::new(640.0, 480.0);
 pub const CURSOR_RANGE: f32 = 10.0;
-pub const PATH_FONT_MEDIUM: &str = "fonts/FiraMono-Medium.ttf";
-pub const PATH_FONT_BOLD: &str = "fonts/FiraSans-Bold.ttf";
-pub const PATH_IMAGE_CHARACTER: &str = "images/character.png";
+pub const PATH_IMAGE_CHARACTER: &str = "bevy-timing-game/character.png";
+pub const PATH_IMAGE_BAR: &str = "bevy-timing-game/bar.png";
+pub const PATH_IMAGE_CUE: &str = "bevy-timing-game/cue.png";
+pub const PATH_IMAGE_INGAME: &str = "bevy-timing-game/ingame.png";
 pub const PATH_IMAGE_MAINMENU: &str = "bevy-timing-game/mainmenu.png";
-pub const PATH_IMAGE_PAUSEBUTTON: &str = "images/pausebutton-light.png";
-pub const PATH_IMAGE_TIMINGBUTTON: &str = "images/timingbutton.png";
-pub const PATH_LDTK_PROJECT: &str = "ldtk/bevy-timing-game.ldtk";
+pub const PATH_IMAGE_TIMINGBUTTON: &str = "bevy-timing-game/timingbutton.png";
+pub const PATH_SOUND_PERFECT: &str = "bevy-timing-game/perfect.ogg";
 pub const PATH_SOUND_GOOD: &str = "bevy-timing-game/good.ogg";
 pub const PATH_SOUND_OK: &str = "bevy-timing-game/ok.ogg";
-pub const PATH_SOUND_PERFECT: &str = "bevy-timing-game/perfect.ogg";
-pub const PATH_SOUND_REVERSAL: &str = "sounds/reversal.ogg";
+
+pub const PATH_FONT_MEDIUM: &str = "fonts/FiraMono-Medium.ttf";
+pub const PATH_FONT_BOLD: &str = "fonts/FiraSans-Bold.ttf";
+pub const PATH_IMAGE_PAUSEBUTTON: &str = "images/pausebutton-light.png";
 pub const PATH_SOUND_TIMING: &str = "sounds/click.ogg";
+pub const PATH_SOUND_REVERSAL: &str = "sounds/reversal.ogg";
 
 const BACKGROUND_COLOR: Color = Color::srgb(0.25, 0.25, 0.25);
 
