@@ -1,9 +1,9 @@
 use bevy::prelude::*;
 
 use crate::{
-    WINDOW_SIZE,
     PATH_IMAGE_CHARACTER,
     AppState,
+    Config,
 };
 use crate::ingame::{
     PerfectEvent,
@@ -11,7 +11,7 @@ use crate::ingame::{
     OkEvent,
     BadEvent,
 };
-use crate::ingame::bar::GRID_SIZE;
+use crate::ingame::GRID_SIZE;
 
 const IMAGE_SIZE: u32 = 32;
 const SIZE: f32 = 64.0;
@@ -41,15 +41,18 @@ fn setup(
     mut commands: Commands,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
     asset_server: Res<AssetServer>,
+    config: Res<Config>,
 ) {
+    if !config.setup_ingame { return }
+
     println!("character: setup");
     let layout = TextureAtlasLayout::from_grid(UVec2::splat(IMAGE_SIZE), COLUMN, ROW, None, None);
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
     let animation_indices = Character { first: IDLE_RANGE.0, last: IDLE_RANGE.1 };
-    let pos = Vec3::new(
-        WINDOW_SIZE.x / 2.0,
-        WINDOW_SIZE.y / 2.0 + GRID_SIZE * 4.0,
-        5.0
+    let (x, y, z) = (
+        0.0,
+        GRID_SIZE * 6.0,
+        0.0
     );
 
     commands.spawn((
@@ -59,7 +62,7 @@ fn setup(
                 ..Default::default()
             },
             texture: asset_server.load(PATH_IMAGE_CHARACTER),
-            transform: Transform::from_translation(pos),
+            transform: Transform::from_xyz(x, y, z),
             ..Default::default()
         },
         TextureAtlas {
@@ -119,6 +122,14 @@ fn update(
     }
 }
 
+fn despawn(
+    mut commands: Commands,
+    query: Query<Entity, With<Character>>,
+) {
+    println!("character: despawn");
+    for entity in query.iter() { commands.entity(entity).despawn() }
+}
+
 pub struct CharacterPlugin;
 
 impl Plugin for CharacterPlugin {
@@ -126,6 +137,7 @@ impl Plugin for CharacterPlugin {
         app
             .add_systems(OnEnter(AppState::Ingame), setup)
             .add_systems(Update, update.run_if(in_state(AppState::Ingame)))
+            .add_systems(OnEnter(AppState::Mainmenu), despawn)
         ;
     }
 }
