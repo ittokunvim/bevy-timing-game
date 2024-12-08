@@ -58,6 +58,7 @@ impl Plugin for IngamePlugin {
             .add_plugins(scoreboard::ScoreboardPlugin)
             .add_plugins(sounds::SoundsPlugin)
             .add_plugins(timer::GameTimerPlugin)
-            .add_plugins(timingbutton::TimingButtonPlugin);
+            .add_plugins(timingbutton::TimingButtonPlugin)
+        ;
     }
 }

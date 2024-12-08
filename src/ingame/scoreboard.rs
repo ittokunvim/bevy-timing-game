@@ -4,6 +4,7 @@ use crate::{
     PATH_FONT_MEDIUM,
     PATH_FONT_BOLD,
     AppState,
+    Config,
     Score,
 };
 
@@ -31,7 +32,10 @@ struct ScoreboardUi;
 fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    config: Res<Config>,
 ) {
+    if !config.setup_ingame { return }
+
     println!("scoreboard: setup");
     commands.spawn((
         TextBundle::from_sections([
@@ -113,6 +117,18 @@ fn score_points(
     }
 }
 
+fn reset_score(mut score: ResMut<Score>) {
+    **score = 0;
+}
+
+fn despawn(
+    mut commands: Commands,
+    query: Query<Entity, With<ScoreboardUi>>,
+) {
+    println!("scoreboard: despawn");
+    for entity in query.iter() { commands.entity(entity).despawn() }
+}
+
 pub struct ScoreboardPlugin;
 
 impl Plugin for ScoreboardPlugin {
@@ -123,6 +139,9 @@ impl Plugin for ScoreboardPlugin {
                 update,
                 score_points,
             ).run_if(in_state(AppState::Ingame)))
+            .add_systems(OnEnter(AppState::Mainmenu), despawn)
+            .add_systems(OnExit(AppState::Gameover), reset_score)
+            .add_systems(OnExit(AppState::Gameclear), reset_score)
         ;
     }
 }
