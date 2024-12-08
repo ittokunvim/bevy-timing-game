@@ -6,6 +6,7 @@ use crate::{
     PATH_SOUND_PERFECT,
     PATH_SOUND_REVERSAL,
     AppState,
+    Config,
 };
 
 use crate::ingame::{
@@ -30,7 +31,10 @@ struct ReversalSound(Handle<AudioSource>);
 fn setup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
+    config: Res<Config>,
 ) {
+    if !config.setup_ingame { return }
+
     println!("sounds: setup");
     let perfect_sound = asset_server.load(PATH_SOUND_PERFECT);
     commands.insert_resource(PerfectSound(perfect_sound));
@@ -52,6 +56,7 @@ fn play_perfect_sound(
 ) {
     if events.is_empty() { return }
     events.clear();
+    // play perfect sound
     println!("sounds: perfect");
     commands.spawn(AudioBundle {
         source: sound.clone(),
@@ -66,6 +71,7 @@ fn play_good_sound(
 ) {
     if events.is_empty() { return }
     events.clear();
+    // play good sound
     println!("sounds: good");
     commands.spawn(AudioBundle {
         source: sound.clone(),
@@ -95,7 +101,7 @@ fn play_reversal_sound(
 ) {
     if events.is_empty() { return }
     events.clear();
-    println!("sounds: reversal");
+    // play reversal sound
     commands.spawn(AudioBundle {
         source: sound.clone(),
         settings: PlaybackSettings::DESPAWN,

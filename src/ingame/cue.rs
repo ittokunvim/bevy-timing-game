@@ -26,7 +26,7 @@ pub struct Cue;
 struct Velocity(Vec2);
 
 const SIZE: f32 = 48.0;
-const SPEED: f32 = 200.0;
+const SPEED: f32 = 400.0;
 
 fn setup(
     mut commands: Commands,

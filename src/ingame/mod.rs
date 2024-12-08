@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+mod background;
 mod bar;
 mod character;
 mod cue;
@@ -11,7 +12,7 @@ mod timer;
 mod timingbutton;
 
 const GRID_SIZE: f32 = 16.0;
-const GAMETIME_LIMIT: f32 = 5.0;
+const GAMETIME_LIMIT: f32 = 10.0;
 
 #[derive(Event, Default)]
 struct PerfectEvent;
@@ -48,6 +49,7 @@ impl Plugin for IngamePlugin {
             .insert_resource(
                 GameTimer(Timer::from_seconds(GAMETIME_LIMIT, TimerMode::Once))
             )
+            .add_plugins(background::BackgroundPlugin)
             .add_plugins(bar::BarPlugin)
             .add_plugins(character::CharacterPlugin)
             .add_plugins(cue::CuePlugin)
