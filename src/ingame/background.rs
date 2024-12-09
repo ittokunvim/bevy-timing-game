@@ -16,7 +16,7 @@ fn setup(
 ) {
     if !config.setup_ingame { return }
 
-    println!("background: despawn");
+    println!("background: setup");
     commands.spawn((
         SpriteBundle {
             texture: asset_server.load(PATH_IMAGE_INGAME),

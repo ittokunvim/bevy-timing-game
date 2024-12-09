@@ -22,7 +22,7 @@ use crate::ingame::bar::{
 #[derive(Component)]
 pub struct Cue;
 
-#[derive(Component, Deref, DerefMut, Debug)]
+#[derive(Component, Deref, DerefMut)]
 struct Velocity(Vec2);
 
 const SIZE: f32 = 48.0;
@@ -58,9 +58,9 @@ fn setup(
 
 fn apply_velocity(
     mut cue_query: Query<(&mut Transform, &mut Velocity), (With<Cue>, Without<Bar>)>,
+    mut events: EventWriter<ReversalEvent>,
     bar_query: Query<&Transform, (With<Bar>, Without<Cue>)>,
     time_step: Res<Time<Fixed>>,
-    mut events: EventWriter<ReversalEvent>,
 ) {
     let Ok((mut cue_transform, mut cue_velocity)) =
         cue_query.get_single_mut() else { return };

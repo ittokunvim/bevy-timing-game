@@ -20,10 +20,10 @@ fn setup(
     if !config.setup_ingame { return }
 
     println!("bar: setup");
-    let (x, y, z): (f32, f32, f32) = (
+    let (x, y, z) = (
         0.0,
         GRID_SIZE * 10.0,
-        10.0,
+        0.0,
     );
 
     commands.spawn((

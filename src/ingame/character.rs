@@ -6,17 +6,17 @@ use crate::{
     Config,
 };
 use crate::ingame::{
+    GRID_SIZE,
     PerfectEvent,
     GoodEvent,
     OkEvent,
     BadEvent,
 };
-use crate::ingame::GRID_SIZE;
 
 const IMAGE_SIZE: u32 = 32;
 const SIZE: f32 = 64.0;
-const COLUMN: u32 = 4;
-const ROW: u32 = 5;
+const IMAGE_COLUMN: u32 = 4;
+const IMAGE_ROW: u32 = 5;
 const IDLE_RANGE: (usize, usize) = (0, 3);
 const IDLE_SECS: f32 = 0.2;
 const PERFECT_RANGE: (usize, usize) = (4, 6);
@@ -46,7 +46,13 @@ fn setup(
     if !config.setup_ingame { return }
 
     println!("character: setup");
-    let layout = TextureAtlasLayout::from_grid(UVec2::splat(IMAGE_SIZE), COLUMN, ROW, None, None);
+    let layout = TextureAtlasLayout::from_grid(
+        UVec2::splat(IMAGE_SIZE),
+        IMAGE_COLUMN,
+        IMAGE_ROW,
+        None,
+        None,
+    );
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
     let animation_indices = Character { first: IDLE_RANGE.0, last: IDLE_RANGE.1 };
     let (x, y, z) = (

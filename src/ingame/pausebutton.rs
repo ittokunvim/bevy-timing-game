@@ -12,6 +12,8 @@ use crate::{
 };
 
 const IMAGE_SIZE: u32 = 64;
+const IMAGE_COLUMN: u32 = 2;
+const IMAGE_ROW: u32 = 1;
 const SIZE: f32 = 32.0;
 const PADDING: f32 = 5.0;
 
@@ -30,7 +32,13 @@ fn setup(
     if !config.setup_ingame { return }
 
     println!("pausebutton: setup");
-    let layout = TextureAtlasLayout::from_grid(UVec2::splat(IMAGE_SIZE), 2, 1, None, None);
+    let layout = TextureAtlasLayout::from_grid(
+        UVec2::splat(IMAGE_SIZE),
+        IMAGE_COLUMN,
+        IMAGE_ROW,
+        None,
+        None,
+    );
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
     let animation_indices = PauseButton { first: 0, last: 1 };
     let (x, y, z) = (

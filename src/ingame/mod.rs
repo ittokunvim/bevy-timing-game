@@ -13,6 +13,7 @@ mod timingbutton;
 
 const GRID_SIZE: f32 = 16.0;
 const GAMETIME_LIMIT: f32 = 10.0;
+const SCORE_CLEARPOINT: usize = 10;
 
 #[derive(Event, Default)]
 struct PerfectEvent;

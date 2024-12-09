@@ -12,6 +12,8 @@ use crate::{
 use crate::ingame::TimingEvent;
 
 const IMAGE_SIZE: u32 = 64;
+const IMAGE_COLUMN: u32 = 2;
+const IMAGE_ROW: u32 = 1;
 const SIZE: f32 = 64.0;
 
 #[derive(Component)]
@@ -25,14 +27,20 @@ struct AnimationTimer(Timer);
 
 fn setup(
     mut commands: Commands,
-    asset_server: Res<AssetServer>,
     mut texture_atlas_layouts: ResMut<Assets<TextureAtlasLayout>>,
+    asset_server: Res<AssetServer>,
     config: Res<Config>,
 ) {
     if !config.setup_ingame { return }
 
     println!("timingbutton: setup");
-    let layout = TextureAtlasLayout::from_grid(UVec2::splat(IMAGE_SIZE), 2, 1, None, None);
+    let layout = TextureAtlasLayout::from_grid(
+        UVec2::splat(IMAGE_SIZE),
+        IMAGE_COLUMN,
+        IMAGE_ROW,
+        None,
+        None,
+    );
     let texture_atlas_layout = texture_atlas_layouts.add(layout);
     let animation_indices = TimingButton { first: 0, last: 1 };
 

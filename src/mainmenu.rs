@@ -45,7 +45,7 @@ fn setup(
         }),
         Mainmenu,
     ))
-    .insert(Name::new("game_title"));
+    .insert(Name::new("gametitle"));
     // click start
     commands.spawn((
         TextBundle::from_section(
@@ -64,12 +64,12 @@ fn setup(
         }),
         Mainmenu,
     ))
-    .insert(Name::new("click_start"));
+    .insert(Name::new("clickstart"));
     // image
     commands.spawn((
         SpriteBundle {
             texture: asset_server.load(PATH_IMAGE_MAINMENU),
-            transform: Transform::from_xyz(0.0, 0.0, -10.0),
+            transform: Transform::from_xyz(0.0, 0.0, -99.0),
             ..Default::default()
         },
         Mainmenu,

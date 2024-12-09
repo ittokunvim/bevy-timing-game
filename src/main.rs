@@ -96,7 +96,7 @@ fn update(
     sound: Res<ClickSound>,
 ) {
     if !mouse_events.just_pressed(MouseButton::Left) { return }
-    // play click sound
+    println!("main: play click sound");
     commands.spawn(AudioBundle {
         source: sound.clone(),
         settings: PlaybackSettings::DESPAWN

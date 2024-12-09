@@ -56,7 +56,6 @@ fn play_perfect_sound(
 ) {
     if events.is_empty() { return }
     events.clear();
-    // play perfect sound
     println!("sounds: perfect");
     commands.spawn(AudioBundle {
         source: sound.clone(),
@@ -71,7 +70,6 @@ fn play_good_sound(
 ) {
     if events.is_empty() { return }
     events.clear();
-    // play good sound
     println!("sounds: good");
     commands.spawn(AudioBundle {
         source: sound.clone(),
@@ -86,7 +84,6 @@ fn play_ok_sound(
 ) {
     if events.is_empty() { return }
     events.clear();
-    // play ok sound
     println!("sounds: ok");
     commands.spawn(AudioBundle {
         source: sound.clone(),

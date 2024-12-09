@@ -4,7 +4,10 @@ use crate::{
     AppState,
     Score,
 };
-use crate::ingame::GameTimer;
+use crate::ingame::{
+    SCORE_CLEARPOINT,
+    GameTimer,
+};
 
 fn update(
     mut timer: ResMut<GameTimer>,
@@ -15,7 +18,7 @@ fn update(
     if timer.0.tick(time.delta()).just_finished() {
         println!("timer: reset");
         timer.0.reset();
-        if **score < 10 {
+        if **score < SCORE_CLEARPOINT {
             println!("timer: moved state to Gameover from Ingame");
             next_state.set(AppState::Gameover);
         } else {

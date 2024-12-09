@@ -47,7 +47,7 @@ pub fn setup(
             position_type: PositionType::Relative,
             top,
             justify_self: JustifySelf::Center,
-                ..Default::default()
+            ..Default::default()
         }),
         Gameover,
     ))
