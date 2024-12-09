@@ -34,13 +34,9 @@
 
 ゲームエンジン [Bevy](https://bevyengine.org)
 
-2Dレベルエディタ [LDtk](https://ldtk.io)
+タイルセット [SunnyLand](https://ansimuz.itch.io/sunny-land-pixel-game-art)
 
-LDtkプラグイン [bevy_ecs_ldtk](https://github.com/Trouv/bevy_ecs_ldtk)
-
-GPUパーティクルシステム [bevy_hanabi](https://github.com/djeedai/bevy_hanabi)
-
-LDtkアセット [SunnyLand](https://ansimuz.itch.io/sunny-land-pixel-game-art)
+フォント [美咲フォント](https://littlelimit.net/misaki.htm)
 
 タイミングボタン画像 [いらすとや](https://www.irasutoya.com/)
 

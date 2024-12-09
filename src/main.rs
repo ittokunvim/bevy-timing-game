@@ -6,24 +6,23 @@ mod ingame;
 mod gameover;
 mod gameclear;
 
-pub const GAMETITLE: &str = "Timing Game";
-pub const WINDOW_SIZE: Vec2 = Vec2::new(640.0, 480.0);
-pub const CURSOR_RANGE: f32 = 10.0;
-pub const PATH_IMAGE_CHARACTER: &str = "bevy-timing-game/character.png";
-pub const PATH_IMAGE_BAR: &str = "bevy-timing-game/bar.png";
-pub const PATH_IMAGE_CUE: &str = "bevy-timing-game/cue.png";
-pub const PATH_IMAGE_INGAME: &str = "bevy-timing-game/ingame.png";
-pub const PATH_IMAGE_MAINMENU: &str = "bevy-timing-game/mainmenu.png";
-pub const PATH_IMAGE_TIMINGBUTTON: &str = "bevy-timing-game/timingbutton.png";
-pub const PATH_SOUND_PERFECT: &str = "bevy-timing-game/perfect.ogg";
-pub const PATH_SOUND_GOOD: &str = "bevy-timing-game/good.ogg";
-pub const PATH_SOUND_OK: &str = "bevy-timing-game/ok.ogg";
+const GAMETITLE: &str = "タイミングゲーム";
+const WINDOW_SIZE: Vec2 = Vec2::new(640.0, 480.0);
+const CURSOR_RANGE: f32 = 10.0;
+const PATH_IMAGE_CHARACTER: &str = "bevy-timing-game/character.png";
+const PATH_IMAGE_BAR: &str = "bevy-timing-game/bar.png";
+const PATH_IMAGE_CUE: &str = "bevy-timing-game/cue.png";
+const PATH_IMAGE_INGAME: &str = "bevy-timing-game/ingame.png";
+const PATH_IMAGE_MAINMENU: &str = "bevy-timing-game/mainmenu.png";
+const PATH_IMAGE_TIMINGBUTTON: &str = "bevy-timing-game/timingbutton.png";
+const PATH_SOUND_PERFECT: &str = "bevy-timing-game/perfect.ogg";
+const PATH_SOUND_GOOD: &str = "bevy-timing-game/good.ogg";
+const PATH_SOUND_OK: &str = "bevy-timing-game/ok.ogg";
 
-pub const PATH_FONT_MEDIUM: &str = "fonts/FiraMono-Medium.ttf";
-pub const PATH_FONT_BOLD: &str = "fonts/FiraSans-Bold.ttf";
-pub const PATH_IMAGE_PAUSEBUTTON: &str = "images/pausebutton-light.png";
-pub const PATH_SOUND_CLICK: &str = "sounds/click.ogg";
-pub const PATH_SOUND_REVERSAL: &str = "sounds/reversal.ogg";
+const PATH_FONT: &str = "fonts/misaki_gothic.ttf";
+const PATH_IMAGE_PAUSEBUTTON: &str = "images/pausebutton-light.png";
+const PATH_SOUND_CLICK: &str = "sounds/click.ogg";
+const PATH_SOUND_REVERSAL: &str = "sounds/reversal.ogg";
 
 const BACKGROUND_COLOR: Color = Color::srgb(0.25, 0.25, 0.25);
 

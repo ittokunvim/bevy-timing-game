@@ -5,21 +5,20 @@ use bevy::{
 
 use crate::{
     WINDOW_SIZE,
-    PATH_FONT_MEDIUM,
-    PATH_FONT_BOLD,
+    PATH_FONT,
     AppState,
     Config,
     Score,
 };
 
-const GAMECLEAR_TEXT: &str = "Game Clear";
-const GAMECLEAR_SIZE: f32 = 32.0;
-const SCORE_TEXT: &str = "Score: ";
-const RETRY_TEXT: &str = "Retry: Key[R]";
-const BACKTOTITLE_TEXT: &str = "Back to Title: Key[B]";
+const GAMECLEAR_TEXT: &str = "ゲームクリア";
+const GAMECLEAR_SIZE: f32 = 28.0;
+const SCORE_TEXT: &str = "スコア: ";
+const RETRY_TEXT: &str = "リトライ: Key[R]";
+const BACKTOTITLE_TEXT: &str = "タイトルに戻る: Key[B]";
 const BOARD_SIZE: Vec2 = Vec2::new(240.0, 240.0);
 const BOARD_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
-const TEXT_SIZE: f32 = 20.0;
+const TEXT_SIZE: f32 = 16.0;
 const TEXT_COLOR: Color = Color::srgb(0.1, 0.1, 0.1);
 const TEXT_PADDING: f32 = 50.0;
 
@@ -41,7 +40,7 @@ pub fn setup(
         TextBundle::from_section(
             GAMECLEAR_TEXT,
             TextStyle {
-                font: asset_server.load(PATH_FONT_BOLD),
+                font: asset_server.load(PATH_FONT),
                 font_size: GAMECLEAR_SIZE,
                 color: TEXT_COLOR,
             },
@@ -63,7 +62,7 @@ pub fn setup(
         TextBundle::from_section(
             text,
             TextStyle {
-                font: asset_server.load(PATH_FONT_MEDIUM),
+                font: asset_server.load(PATH_FONT),
                 font_size: TEXT_SIZE,
                 color: TEXT_COLOR,
             },
@@ -84,7 +83,7 @@ pub fn setup(
         TextBundle::from_section(
             RETRY_TEXT,
             TextStyle {
-                font: asset_server.load(PATH_FONT_MEDIUM),
+                font: asset_server.load(PATH_FONT),
                 font_size: TEXT_SIZE,
                 color: TEXT_COLOR,
             },
@@ -105,7 +104,7 @@ pub fn setup(
         TextBundle::from_section(
             BACKTOTITLE_TEXT, 
             TextStyle {
-                font: asset_server.load(PATH_FONT_MEDIUM),
+                font: asset_server.load(PATH_FONT),
                 font_size: TEXT_SIZE,
                 color: TEXT_COLOR,
             }

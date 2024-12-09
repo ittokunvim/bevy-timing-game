@@ -1,8 +1,7 @@
 use bevy::prelude::*;
 
 use crate::{
-    PATH_FONT_MEDIUM,
-    PATH_FONT_BOLD,
+    PATH_FONT,
     AppState,
     Config,
     Score,
@@ -16,13 +15,13 @@ use crate::ingame::{
     GameTimer,
 };
 
-const SCORE_TEXT: &str = "Score: ";
-const TIME_TEXT: &str = " | Time: ";
+const SCORE_TEXT: &str = "スコア: ";
+const TIME_TEXT: &str = " | タイム: ";
 const PERFECT_POINT: usize = 3;
 const GOOD_POINT: usize = 2;
 const OK_POINT: usize = 1;
 const BAD_POINT: usize = 3;
-const TEXT_SIZE: f32 = 24.0;
+const TEXT_SIZE: f32 = 20.0;
 const TEXT_COLOR: Color = Color::srgb(0.1, 0.1, 0.1);
 const TEXT_PADDING: Val = Val::Px(5.0);
 
@@ -42,26 +41,26 @@ fn setup(
             TextSection::new(
                 SCORE_TEXT,
                 TextStyle {
-                    font: asset_server.load(PATH_FONT_BOLD),
+                    font: asset_server.load(PATH_FONT),
                     font_size: TEXT_SIZE,
                     color: TEXT_COLOR,
                 },
             ),
             TextSection::from_style(TextStyle {
-                font: asset_server.load(PATH_FONT_MEDIUM),
+                font: asset_server.load(PATH_FONT),
                 font_size: TEXT_SIZE,
                 color: TEXT_COLOR,
             }),
             TextSection::new(
                 TIME_TEXT,
                 TextStyle {
-                    font: asset_server.load(PATH_FONT_BOLD),
+                    font: asset_server.load(PATH_FONT),
                     font_size: TEXT_SIZE,
                     color: TEXT_COLOR,
                 },
             ),
             TextSection::from_style(TextStyle {
-                font: asset_server.load(PATH_FONT_MEDIUM),
+                font: asset_server.load(PATH_FONT),
                 font_size: TEXT_SIZE,
                 color: TEXT_COLOR,
             }),

@@ -6,8 +6,7 @@ use bevy::{
 use crate::{
     GAMETITLE,
     WINDOW_SIZE,
-    PATH_FONT_MEDIUM,
-    PATH_FONT_BOLD,
+    PATH_FONT,
     PATH_IMAGE_MAINMENU,
     AppState,
     Config,
@@ -15,10 +14,10 @@ use crate::{
 
 const GAMETITLE_SIZE: f32 = 32.0;
 const GAMETITLE_COLOR: Color = Color::srgb(0.1, 0.1, 0.1);
-const CLICKSTART_TEXT: &str = "Click Start";
+const CLICKSTART_TEXT: &str = "クリックしてスタート";
 const CLICKSTART_COLOR: Color = Color::srgb(0.2, 0.2, 0.2);
 const BOARD_SIZE: Vec2 = Vec2::new(320.0, 240.0);
-const BOARD_COLOR: Color = Color::srgba(0.9, 0.9, 0.9, 0.8);
+const BOARD_COLOR: Color = Color::srgba(0.9, 0.9, 0.9, 0.75);
 const TEXT_SIZE: f32 = 20.0;
 
 #[derive(Component)]
@@ -38,7 +37,7 @@ fn setup(
         TextBundle::from_section(
             GAMETITLE,
             TextStyle {
-                font: asset_server.load(PATH_FONT_BOLD),
+                font: asset_server.load(PATH_FONT),
                 font_size: GAMETITLE_SIZE,
                 color: GAMETITLE_COLOR,
             }
@@ -59,7 +58,7 @@ fn setup(
         TextBundle::from_section(
             CLICKSTART_TEXT,
             TextStyle {
-                font: asset_server.load(PATH_FONT_MEDIUM),
+                font: asset_server.load(PATH_FONT),
                 font_size: TEXT_SIZE,
                 color: CLICKSTART_COLOR,
             },
