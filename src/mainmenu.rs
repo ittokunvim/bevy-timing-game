@@ -1,4 +1,7 @@
-use bevy::prelude::*;
+use bevy::{
+    prelude::*,
+    sprite::{MaterialMesh2dBundle, Mesh2dHandle},
+};
 
 use crate::{
     GAMETITLE,
@@ -10,23 +13,26 @@ use crate::{
     Config,
 };
 
-const GAMETITLE_SIZE: f32 = 40.0;
+const GAMETITLE_SIZE: f32 = 32.0;
 const GAMETITLE_COLOR: Color = Color::srgb(0.1, 0.1, 0.1);
-const CLICKSTART_TEXT: &str = "Click Start...";
-const CLICKSTART_COLOR: Color = Color::srgb(0.9, 0.9, 0.9);
-const TEXT_SIZE: f32 = 30.0;
-const TEXT_PADDING: Val = Val::Px(16.0);
+const CLICKSTART_TEXT: &str = "Click Start";
+const CLICKSTART_COLOR: Color = Color::srgb(0.2, 0.2, 0.2);
+const BOARD_SIZE: Vec2 = Vec2::new(320.0, 240.0);
+const BOARD_COLOR: Color = Color::srgba(0.9, 0.9, 0.9, 0.8);
+const TEXT_SIZE: f32 = 20.0;
 
 #[derive(Component)]
 struct Mainmenu;
 
 fn setup(
     mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
     asset_server: Res<AssetServer>,
 ) {
     println!("mainmenu: setup");
     // game title
-    let top = Val::Px(WINDOW_SIZE.y / 2.0 - GAMETITLE_SIZE / 2.0);
+    let top = Val::Px(WINDOW_SIZE.y / 2.0 - GAMETITLE_SIZE / 2.0 - BOARD_SIZE.y / 4.0);
 
     commands.spawn((
         TextBundle::from_section(
@@ -47,6 +53,8 @@ fn setup(
     ))
     .insert(Name::new("gametitle"));
     // click start
+    let top = Val::Px(WINDOW_SIZE.y / 2.0 - TEXT_SIZE / 2.0 + BOARD_SIZE.y / 4.0);
+
     commands.spawn((
         TextBundle::from_section(
             CLICKSTART_TEXT,
@@ -57,14 +65,24 @@ fn setup(
             },
         )
         .with_style(Style {
-            position_type: PositionType::Absolute,
-            right: TEXT_PADDING,
-            bottom: TEXT_PADDING,
+            position_type: PositionType::Relative,
+            justify_self: JustifySelf::Center,
+            top,
             ..Default::default()
         }),
         Mainmenu,
     ))
     .insert(Name::new("clickstart"));
+    // board
+    commands.spawn((
+        MaterialMesh2dBundle {
+            mesh: Mesh2dHandle(meshes.add(Rectangle::new(BOARD_SIZE.x, BOARD_SIZE.y))),
+            material: materials.add(BOARD_COLOR),
+            ..Default::default()
+        },
+        Mainmenu,
+    ))
+    .insert(Name::new("board"));
     // image
     commands.spawn((
         SpriteBundle {
