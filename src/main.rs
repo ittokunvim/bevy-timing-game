@@ -6,18 +6,18 @@ mod ingame;
 mod gameover;
 mod gameclear;
 
-const GAMETITLE: &str = "タイミングゲーム";
+const GAMETITLE: &str = "いっとくタイミングゲーム";
 const WINDOW_SIZE: Vec2 = Vec2::new(640.0, 480.0);
 const CURSOR_RANGE: f32 = 10.0;
-const PATH_IMAGE_CHARACTER: &str = "bevy-timing-game/character.png";
-const PATH_IMAGE_BAR: &str = "bevy-timing-game/bar.png";
-const PATH_IMAGE_CUE: &str = "bevy-timing-game/cue.png";
-const PATH_IMAGE_INGAME: &str = "bevy-timing-game/ingame.png";
-const PATH_IMAGE_MAINMENU: &str = "bevy-timing-game/mainmenu.png";
-const PATH_IMAGE_TIMINGBUTTON: &str = "bevy-timing-game/timingbutton.png";
-const PATH_SOUND_PERFECT: &str = "bevy-timing-game/perfect.ogg";
-const PATH_SOUND_GOOD: &str = "bevy-timing-game/good.ogg";
-const PATH_SOUND_OK: &str = "bevy-timing-game/ok.ogg";
+const PATH_IMAGE_CHARACTER: &str = "ittoku-timing-game/character.png";
+const PATH_IMAGE_BAR: &str = "ittoku-timing-game/bar.png";
+const PATH_IMAGE_CUE: &str = "ittoku-timing-game/cue.png";
+const PATH_IMAGE_INGAME: &str = "ittoku-timing-game/ingame.png";
+const PATH_IMAGE_MAINMENU: &str = "ittoku-timing-game/mainmenu.png";
+const PATH_IMAGE_TIMINGBUTTON: &str = "ittoku-timing-game/timingbutton.png";
+const PATH_SOUND_PERFECT: &str = "ittoku-timing-game/perfect.ogg";
+const PATH_SOUND_GOOD: &str = "ittoku-timing-game/good.ogg";
+const PATH_SOUND_OK: &str = "ittoku-timing-game/ok.ogg";
 
 const PATH_FONT: &str = "fonts/misaki_gothic.ttf";
 const PATH_IMAGE_PAUSEBUTTON: &str = "images/pausebutton-light.png";
