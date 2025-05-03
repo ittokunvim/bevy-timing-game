@@ -1,4 +1,7 @@
-use bevy::prelude::*;
+use bevy::{
+    prelude::*,
+    asset::AssetMetaCheck,
+};
 // use bevy_hanabi::prelude::*;
 
 mod mainmenu;
@@ -59,6 +62,10 @@ fn main() {
                 ..default()
             })
             .set(ImagePlugin::default_nearest())
+            .set(AssetPlugin {
+                meta_check: AssetMetaCheck::Never,
+                ..Default::default()
+            })
         )
         .init_state::<AppState>()
         .insert_resource(ClearColor(BACKGROUND_COLOR))
