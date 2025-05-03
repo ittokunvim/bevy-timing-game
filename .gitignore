@@ -1,6 +1,5 @@
 /target
+/examples
 
 .DS_Store
 
-examples/assets
-examples/bevy-timing-game*
