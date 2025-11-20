@@ -56,6 +56,7 @@ fn main() {
             .set(WindowPlugin {
                 primary_window: Some(Window {
                     resolution: WINDOW_SIZE.into(),
+                    canvas: Some("#bevy".into()),
                     title: GAMETITLE.to_string(),
                     ..default()
                 }),
