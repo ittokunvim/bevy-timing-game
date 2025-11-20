@@ -1,5 +1,5 @@
 [package]
-name = "ittoku-timing-game"
+name = "ittoku_timing_game"
 version = "0.1.1"
 edition = "2021"
 
